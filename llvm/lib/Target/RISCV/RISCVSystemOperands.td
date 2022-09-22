@@ -443,3 +443,12 @@ def : SysReg<"vsiph", 0x254>;
 //===-----------------------------------------------
 
 def : SysReg<"jvt", 0x017>;
+def : SysReg<"vlenb", 0xC22>;
+
+//===-----------------------------------------------
+// User Matrix CSRs
+//===-----------------------------------------------
+def : SysReg<"mtype", 0xC43>;
+def : SysReg<"tile_m", 0xC40>;
+def : SysReg<"tile_k", 0xC42>;
+def : SysReg<"tile_n", 0xC41>;

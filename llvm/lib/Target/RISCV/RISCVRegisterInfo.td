@@ -420,6 +420,65 @@ foreach Index = 0-31 in {
   def V#Index : RISCVReg<Index, "v"#Index>, DwarfRegNum<[!add(Index, 96)]>;
 }
 
+let RegAltNameIndices = [ABIRegAltName] in {
+  foreach Index = 0-31 in {
+    def V#Index : RISCVReg<Index, "v"#Index, ["v"#Index]>, DwarfRegNum<[!add(Index, 96)]>;
+  }
+
+  foreach Index = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22,
+                   24, 26, 28, 30] in {
+    def V#Index#M2 : RISCVRegWithSubRegs<Index, "v"#Index,
+                       [!cast<Register>("V"#Index),
+                        !cast<Register>("V"#!add(Index, 1))],
+                       ["v"#Index]>,
+                     DwarfRegAlias<!cast<Register>("V"#Index)> {
+      let SubRegIndices = [sub_vrm1_0, sub_vrm1_1];
+    }
+  }
+
+  foreach Index = [0, 4, 8, 12, 16, 20, 24, 28] in {
+    def V#Index#M4 : RISCVRegWithSubRegs<Index, "v"#Index,
+                       [!cast<Register>("V"#Index#"M2"),
+                        !cast<Register>("V"#!add(Index, 2)#"M2")],
+                       ["v"#Index]>,
+                     DwarfRegAlias<!cast<Register>("V"#Index)> {
+      let SubRegIndices = [sub_vrm2_0, sub_vrm2_1];
+    }
+  }
+
+  foreach Index = [0, 8, 16, 24] in {
+    def V#Index#M8 : RISCVRegWithSubRegs<Index, "v"#Index,
+                       [!cast<Register>("V"#Index#"M4"),
+                        !cast<Register>("V"#!add(Index, 4)#"M4")],
+                       ["v"#Index]>,
+                     DwarfRegAlias<!cast<Register>("V"#Index)> {
+      let SubRegIndices = [sub_vrm4_0, sub_vrm4_1];
+    }
+  }
+
+  let RegAltNameIndices = [ABIRegAltName] in {
+    foreach Index = 0-8 in {
+      def TR#Index : RISCVReg<Index, "tr"#Index, ["tr"#Index]>, DwarfRegNum<[!add(Index, 96)]>;
+    }
+  }
+  let RegAltNameIndices = [ABIRegAltName] in {
+    foreach Index = 0-1 in {
+      def ACC#Index : RISCVReg<Index, "acc"#Index, ["acc"#Index]>, DwarfRegNum<[!add(Index, 96)]>;
+    }
+  }
+
+  def VTYPE  : RISCVReg<0, "vtype", ["vtype"]>;
+  def VL     : RISCVReg<0, "vl", ["vl"]>;
+  def VXSAT  : RISCVReg<0, "vxsat", ["vxsat"]>;
+  def VXRM   : RISCVReg<0, "vxrm", ["vxrm"]>;
+
+  def MTYPE  : RISCVReg<0, "mtype", ["mtype"]>;
+  def TILEM  : RISCVReg<0, "tilem", ["tilem"]>;
+  def TILEN  : RISCVReg<0, "tilen", ["tilen"]>;
+  def TILEK  : RISCVReg<0, "tilek", ["tilek"]>;
+  def TSIDX  : RISCVReg<0, "tsidx", ["tsidx"]>;
+}
+
 foreach Index = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22,
                  24, 26, 28, 30] in {
   def V#Index#M2 : RISCVRegWithSubRegs<Index, "v"#Index,
@@ -492,6 +551,53 @@ defvar VM1VTs = [vint8m1_t, vint16m1_t, vint32m1_t, vint64m1_t,
 	               vint16mf2_t, vint16mf4_t, vint32mf2_t,
                  vfloat16mf4_t, vfloat16mf2_t, vbfloat16mf4_t,
                  vbfloat16mf2_t, vfloat32mf2_t];
+
+class TRReg<list<ValueType> regTypes, dag regList, int Vlmul>
+  : RegisterClass<"RISCV",
+                  regTypes,
+                  64, // The maximum supported ELEN is 64.
+                  regList> {
+  int VLMul = Vlmul;
+  int Size = !mul(Vlmul, 64);
+}
+
+class ACCReg<list<ValueType> regTypes, dag regList, int Vlmul>
+  : RegisterClass<"RISCV",
+                  regTypes,
+                  64, // The maximum supported ELEN is 64.
+                  regList> {
+  int VLMul = Vlmul;
+  int Size = !mul(Vlmul, 64);
+}
+
+def TRR : TRReg<[vint8m1_t, vint16m1_t, vint32m1_t, vint64m1_t,
+               vfloat16m1_t, vfloat32m1_t, vfloat64m1_t,
+               vint8mf2_t, vint8mf4_t, vint8mf8_t,
+               vint16mf2_t, vint16mf4_t, vint32mf2_t,
+               vfloat16mf4_t, vfloat16mf2_t, vfloat32mf2_t,
+               vbool64_t, vbool32_t, vbool16_t, vbool8_t, vbool4_t,
+               vbool2_t, vbool1_t],
+           (add (sequence "TR%u", 0, 7)), 1>;
+
+def ACCR : ACCReg<[vint8m1_t, vint16m1_t, vint32m1_t, vint64m1_t,
+               vfloat16m1_t, vfloat32m1_t, vfloat64m1_t,
+               vint8mf2_t, vint8mf4_t, vint8mf8_t,
+               vint16mf2_t, vint16mf4_t, vint32mf2_t,
+               vfloat16mf4_t, vfloat16mf2_t, vfloat32mf2_t,
+               vbool64_t, vbool32_t, vbool16_t, vbool8_t, vbool4_t,
+               vbool2_t, vbool1_t],
+           (add (sequence "ACC%u", 0, 1)), 1>;
+
+def VRNoV0 : VReg<[vint8m1_t, vint16m1_t, vint32m1_t, vint64m1_t,
+                   vfloat16m1_t, vfloat32m1_t, vfloat64m1_t,
+                   vint8mf2_t, vint8mf4_t, vint8mf8_t,
+                   vint16mf2_t, vint16mf4_t, vint32mf2_t,
+                   vfloat16mf4_t, vfloat16mf2_t, vfloat32mf2_t,
+                   vbool64_t, vbool32_t, vbool16_t, vbool8_t, vbool4_t,
+                   vbool2_t, vbool1_t],
+               (add (sequence "V%u", 25, 31),
+                    (sequence "V%u", 8, 24),
+                    (sequence "V%u", 1, 7)), 1>;
 
 defvar VM2VTs = [vint8m2_t, vint16m2_t, vint32m2_t, vint64m2_t,
                  vfloat16m2_t, vbfloat16m2_t,

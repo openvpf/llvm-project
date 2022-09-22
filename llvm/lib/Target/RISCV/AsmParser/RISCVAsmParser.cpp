@@ -196,6 +196,7 @@ class RISCVAsmParser : public MCTargetAsmParser {
   ParseStatus parsePseudoJumpSymbol(OperandVector &Operands);
   ParseStatus parseJALOffset(OperandVector &Operands);
   ParseStatus parseVTypeI(OperandVector &Operands);
+  ParseStatus parseMTypeI(OperandVector &Operands);
   ParseStatus parseMaskReg(OperandVector &Operands);
   ParseStatus parseInsnDirectiveOpcode(OperandVector &Operands);
   ParseStatus parseInsnCDirectiveOpcode(OperandVector &Operands);
@@ -320,6 +321,7 @@ struct RISCVOperand final : public MCParsedAsmOperand {
     FPImmediate,
     SystemRegister,
     VType,
+    MType,
     FRM,
     Fence,
     Rlist,
@@ -338,6 +340,10 @@ struct RISCVOperand final : public MCParsedAsmOperand {
 
   struct FPImmOp {
     uint64_t Val;
+  };
+
+  struct MTypeOp {
+    unsigned Val;
   };
 
   struct SysRegOp {
@@ -376,6 +382,7 @@ struct RISCVOperand final : public MCParsedAsmOperand {
     FPImmOp FPImm;
     struct SysRegOp SysReg;
     struct VTypeOp VType;
+    struct MTypeOp MType;
     struct FRMOp FRM;
     struct FenceOp Fence;
     struct RlistOp Rlist;
@@ -407,6 +414,9 @@ public:
       break;
     case KindTy::VType:
       VType = o.VType;
+      break;
+    case KindTy::MType:
+      MType = o.MType;
       break;
     case KindTy::FRM:
       FRM = o.FRM;
@@ -446,6 +456,8 @@ public:
   bool isSystemRegister() const { return Kind == KindTy::SystemRegister; }
   bool isRlist() const { return Kind == KindTy::Rlist; }
   bool isSpimm() const { return Kind == KindTy::Spimm; }
+  bool isVType() const { return Kind == KindTy::VType; }
+  bool isMType() const { return Kind == KindTy::MType; }
 
   bool isGPR() const {
     return Kind == KindTy::Register &&
@@ -556,6 +568,8 @@ public:
       return isVTypeImm(11);
     return Kind == KindTy::VType;
   }
+  bool isVTypeI() const { return isVType(); }
+  bool isMTypeI() const { return isMType(); }
 
   /// Return true if the operand is a valid for the fence instruction e.g.
   /// ('iorw').
@@ -709,6 +723,15 @@ public:
     bool IsConstantImm = evaluateConstantImm(getImm(), Imm, VK);
     return IsConstantImm && Imm >= INT64_C(2) && Imm <= INT64_C(14) &&
            VK == RISCVMCExpr::VK_RISCV_None;
+  }
+
+  bool isUImm13() const {
+    int64_t Imm;
+    RISCVMCExpr::VariantKind VK = RISCVMCExpr::VK_RISCV_None;
+    if (!isImm())
+      return false;
+    bool IsConstantImm = evaluateConstantImm(getImm(), Imm, VK);
+    return IsConstantImm && isUInt<13>(Imm) && VK == RISCVMCExpr::VK_RISCV_None;
   }
 
   bool isSImm5() const {
@@ -974,6 +997,10 @@ public:
   unsigned getFence() const {
     assert(Kind == KindTy::Fence && "Invalid type access!");
     return Fence.Val;
+
+  unsigned getMType() const {
+    assert(Kind == KindTy::MType && "Invalid type access!");
+    return MType.Val;
   }
 
   void print(raw_ostream &OS) const override {
@@ -1022,6 +1049,9 @@ public:
     case KindTy::Spimm:
       OS << "<Spimm: ";
       RISCVZC::printSpimm(Spimm.Val, OS);
+    case KindTy::MType:
+      OS << "<mtype: ";
+      RISCVVType::printMType(getMType(), OS);
       OS << '>';
       break;
     }
@@ -1060,6 +1090,15 @@ public:
     Op->FPImm.Val = Val;
     Op->StartLoc = S;
     Op->EndLoc = S;
+    return Op;
+  }
+
+  static std::unique_ptr<RISCVOperand> createMType(unsigned MTypeI, SMLoc S,
+                                                   bool IsRV64) {
+    auto Op = std::make_unique<RISCVOperand>(KindTy::MType);
+    Op->VType.Val = MTypeI;
+    Op->StartLoc = S;
+    Op->IsRV64 = IsRV64;
     return Op;
   }
 
@@ -1153,6 +1192,11 @@ public:
   void addFenceArgOperands(MCInst &Inst, unsigned N) const {
     assert(N == 1 && "Invalid number of operands!");
     Inst.addOperand(MCOperand::createImm(Fence.Val));
+  }
+
+  void addMTypeIOperands(MCInst &Inst, unsigned N) const {
+    assert(N == 1 && "Invalid number of operands!");
+    Inst.addOperand(MCOperand::createImm(getMType()));
   }
 
   void addCSRSystemRegisterOperands(MCInst &Inst, unsigned N) const {
@@ -1522,6 +1566,13 @@ bool RISCVAsmParser::MatchAndEmitInstruction(SMLoc IDLoc, unsigned &Opcode,
   case Match_InvalidVTypeI: {
     SMLoc ErrorLoc = ((RISCVOperand &)*Operands[ErrorInfo]).getStartLoc();
     return generateVTypeError(ErrorLoc);
+  }
+  case Match_InvalidMTypeI: {
+    SMLoc ErrorLoc = ((RISCVOperand &)*Operands[ErrorInfo]).getStartLoc();
+    return Error(
+        ErrorLoc,
+        "operand must be "
+        "e[8|16|32|64|128|256|512|1024]");
   }
   case Match_InvalidVMaskRegister: {
     SMLoc ErrorLoc = ((RISCVOperand &)*Operands[ErrorInfo]).getStartLoc();
@@ -2304,6 +2355,79 @@ ParseStatus RISCVAsmParser::parseFenceArg(OperandVector &Operands) {
 ParseFail:
   return TokError("operand must be formed of letters selected in-order from "
                   "'iorw' or be 0");
+}
+
+ParseStatus RISCVAsmParser::parseMTypeI(OperandVector &Operands) {
+  SMLoc S = getLoc();
+  if (getLexer().isNot(AsmToken::Identifier))
+    goto MatchFail;
+
+  SmallVector<AsmToken, 7> MTypeIElements;
+  // Put all the tokens for mtypei operand into VTypeIElements vector.
+  while (getLexer().isNot(AsmToken::EndOfStatement)) {
+    MTypeIElements.push_back(getLexer().getTok());
+    getLexer().Lex();
+    if (getLexer().is(AsmToken::EndOfStatement))
+      break;
+    if (getLexer().isNot(AsmToken::Comma))
+      goto MatchFail;
+    AsmToken Comma = getLexer().getTok();
+    MTypeIElements.push_back(Comma);
+    getLexer().Lex();
+  }
+
+  if (MTypeIElements.size() == 7) {
+    // The MTypeIElements layout is:
+    // SEW comma mltr comma mrtr comma maccq
+    //  0    1    2     3    4   5    6
+    StringRef Name = MTypeIElements[0].getIdentifier();
+    if (!Name.consume_front("e"))
+      goto MatchFail;
+    unsigned Sew;
+    if (Name.getAsInteger(10, Sew))
+      goto MatchFail;
+    if (!RISCVVType::isValidSEW(Sew))
+      goto MatchFail;
+
+    Name = MTypeIElements[2].getIdentifier();
+    bool MatrixLeftTransform;
+    if (Name == "true")
+      MatrixLeftTransform = true;
+    else if (Name == "false")
+      MatrixLeftTransform = false;
+    else
+      goto MatchFail;
+
+    Name = MTypeIElements[4].getIdentifier();
+    bool MatrixRightTransform;
+    if (Name == "true")
+      MatrixRightTransform = true;
+    else if (Name == "false")
+      MatrixRightTransform = false;
+    else
+      goto MatchFail;
+
+    Name = MTypeIElements[6].getIdentifier();
+    bool MatrixAccQ;
+    if (Name == "maccq")
+      MatrixAccQ = true;
+    else if (Name == "maccd")
+      MatrixAccQ = false;
+    else
+      goto MatchFail;
+
+
+    unsigned MTypeI =
+        RISCVVType::encodeMTYPE(Sew, MatrixLeftTransform, MatrixRightTransform, MatrixAccQ);
+    Operands.push_back(RISCVOperand::createMType(MTypeI, S, isRV64()));
+    return ParseStatus::Success;
+  }
+
+// If NoMatch, unlex all the tokens that comprise a vtypei operand
+MatchFail:
+  while (!MTypeIElements.empty())
+    getLexer().UnLex(MTypeIElements.pop_back_val());
+  return ParseStatus::Failure;
 }
 
 ParseStatus RISCVAsmParser::parseMemOpBaseReg(OperandVector &Operands) {
