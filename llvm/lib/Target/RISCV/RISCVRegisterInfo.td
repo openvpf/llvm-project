@@ -457,15 +457,11 @@ let RegAltNameIndices = [ABIRegAltName] in {
   }
 
   let RegAltNameIndices = [ABIRegAltName] in {
-    foreach Index = 0-8 in {
+    foreach Index = 0-7 in {
       def TR#Index : RISCVReg<Index, "tr"#Index, ["tr"#Index]>, DwarfRegNum<[!add(Index, 96)]>;
     }
   }
-  let RegAltNameIndices = [ABIRegAltName] in {
-    foreach Index = 0-15 in {
-      def ACC#Index : RISCVReg<Index, "acc"#Index, ["acc"#Index]>, DwarfRegNum<[!add(Index, 96)]>;
-    }
-  }
+
 
   def VTYPE  : RISCVReg<0, "vtype", ["vtype"]>;
   def VL     : RISCVReg<0, "vl", ["vl"]>;
@@ -476,6 +472,8 @@ let RegAltNameIndices = [ABIRegAltName] in {
   def TILEM  : RISCVReg<0, "tilem", ["tilem"]>;
   def TILEN  : RISCVReg<0, "tilen", ["tilen"]>;
   def TILEK  : RISCVReg<0, "tilek", ["tilek"]>;
+  def MLENB  : RISCVReg<0, "mlenb", ["mlenb"]>;
+  def MLUT   : RISCVReg<0, "mlut",  ["mlut"]>;
 
   def MOUTSH : RISCVReg<0, "moutsh", ["mkrsh"]>;
   def MINSH  : RISCVReg<0, "minsh",  ["mfdsh"]>;
@@ -567,15 +565,6 @@ class TRReg<list<ValueType> regTypes, dag regList, int Vlmul>
   int Size = !mul(Vlmul, 64);
 }
 
-class ACCReg<list<ValueType> regTypes, dag regList, int Vlmul>
-  : RegisterClass<"RISCV",
-                  regTypes,
-                  64, // The maximum supported ELEN is 64.
-                  regList> {
-  int VLMul = Vlmul;
-  int Size = !mul(Vlmul, 64);
-}
-
 def TRR : TRReg<[vint8m1_t, vint16m1_t, vint32m1_t, vint64m1_t,
                vfloat16m1_t, vfloat32m1_t, vfloat64m1_t,
                vint8mf2_t, vint8mf4_t, vint8mf8_t,
@@ -584,15 +573,6 @@ def TRR : TRReg<[vint8m1_t, vint16m1_t, vint32m1_t, vint64m1_t,
                vbool64_t, vbool32_t, vbool16_t, vbool8_t, vbool4_t,
                vbool2_t, vbool1_t],
            (add (sequence "TR%u", 0, 7)), 1>;
-
-def ACCR : ACCReg<[vint8m1_t, vint16m1_t, vint32m1_t, vint64m1_t,
-               vfloat16m1_t, vfloat32m1_t, vfloat64m1_t,
-               vint8mf2_t, vint8mf4_t, vint8mf8_t,
-               vint16mf2_t, vint16mf4_t, vint32mf2_t,
-               vfloat16mf4_t, vfloat16mf2_t, vfloat32mf2_t,
-               vbool64_t, vbool32_t, vbool16_t, vbool8_t, vbool4_t,
-               vbool2_t, vbool1_t],
-           (add (sequence "ACC%u", 0, 15)), 1>;
 
 def VRNoV0 : VReg<[vint8m1_t, vint16m1_t, vint32m1_t, vint64m1_t,
                    vfloat16m1_t, vfloat32m1_t, vfloat64m1_t,

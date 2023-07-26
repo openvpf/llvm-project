@@ -265,6 +265,25 @@ void RISCVInstPrinter::printMTypeI(const MCInst *MI, unsigned OpNo,
   RISCVVType::printMType(Imm, O);
 }
 
+void RISCVInstPrinter::printMopi(const MCInst *MI, unsigned OpNo,
+                                   const MCSubtargetInfo &STI, raw_ostream &O) {
+  unsigned Iopcode = MI->getOpcode();
+  unsigned mopi = (Iopcode >> 25) & 0x3;
+  unsigned mtr = (Iopcode >> 27) & 0x1;
+  if (mopi == 0)
+    O << ", mtc";
+  else if (mopi == 1)
+    O << ", mta";
+  else if (mopi == 2)
+    O << ", mtb";
+
+  if (mtr == 1)
+    O << ", mtr";
+  else
+    O << ", none"; 
+}
+
+
 void RISCVInstPrinter::printVMaskReg(const MCInst *MI, unsigned OpNo,
                                      const MCSubtargetInfo &STI,
                                      raw_ostream &O) {

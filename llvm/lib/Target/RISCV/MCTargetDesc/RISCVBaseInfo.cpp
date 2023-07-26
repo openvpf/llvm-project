@@ -169,6 +169,16 @@ unsigned RISCVVType::encodeMTYPE(unsigned SEW, bool maccq) {
   return MTypeI;
 }
 
+unsigned RISCVVType::encodeMopi(unsigned mopi, bool mtr) {
+  assert(isValidMopi(mopi) && "Invalid MOPI");
+  unsigned Mopi = mopi;
+  if (mtr)
+    Mopi |= (1 << 2);
+
+  return Mopi;
+}
+
+
 std::pair<unsigned, bool> RISCVVType::decodeVLMUL(RISCVII::VLMUL VLMUL) {
   switch (VLMUL) {
   default:
@@ -329,6 +339,29 @@ void RISCVZC::printSpimm(int64_t Spimm, raw_ostream &OS) { OS << Spimm; }
 void RISCVVType::printMType(unsigned MType, raw_ostream &OS) {
   unsigned Sew = getMSEW(MType);
   OS << "e" << Sew;
+  unsigned maccq = getMaccq(MType);
+  if (maccq)
+    OS << ", maccq";
+  else
+    OS << ", maccd";
+}
+
+void RISCVVType::printMOpiType(unsigned MOpiType, raw_ostream &OS) {
+  unsigned mopiTr = getMopi(MOpiType);
+  unsigned mopi = mopiTr & 0x3;
+  unsigned mtr = (mopiTr >> 2) & 0x1;
+  if (mopi == 0)
+    OS << "mtc";
+  else if (mopi == 1)
+    OS << "mta";
+  else if (mopi == 2)
+    OS << "mtb";
+  
+  if (mtr)
+    OS << "mtr";
+  else
+    OS << "none";
+
 }
 
 } // namespace llvm

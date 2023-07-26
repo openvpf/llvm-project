@@ -48,6 +48,8 @@ public:
                    raw_ostream &O);
   void printMTypeI(const MCInst *MI, unsigned OpNo, const MCSubtargetInfo &STI,
                    raw_ostream &O);
+  void printMopi(const MCInst *MI, unsigned OpNo, const MCSubtargetInfo &STI,
+                   raw_ostream &O);
   void printVMaskReg(const MCInst *MI, unsigned OpNo,
                      const MCSubtargetInfo &STI, raw_ostream &O);
   void printRlist(const MCInst *MI, unsigned OpNo, const MCSubtargetInfo &STI,

@@ -498,6 +498,10 @@ inline static bool isValidSEW(unsigned SEW) {
   return isPowerOf2_32(SEW) && SEW >= 8 && SEW <= 1024;
 }
 
+inline static bool isValidMopi(unsigned mopi) {
+  return mopi >= 0 && mopi <= 2;
+}
+
 // Is this a LMUL value that can be encoded into the VTYPE format.
 inline static bool isValidLMUL(unsigned LMUL, bool Fractional) {
   return isPowerOf2_32(LMUL) && LMUL <= 8 && (!Fractional || LMUL != 1);
@@ -507,6 +511,8 @@ unsigned encodeVTYPE(RISCVII::VLMUL VLMUL, unsigned SEW, bool TailAgnostic,
                      bool MaskAgnostic);
 
 unsigned encodeMTYPE(unsigned SEW, bool maccq);
+unsigned encodeMopi(unsigned mopi, bool mtr);
+
 
 inline static RISCVII::VLMUL getVLMUL(unsigned VType) {
   unsigned VLMUL = VType & 0x7;
@@ -547,6 +553,21 @@ inline static unsigned getMSEW(unsigned MType) {
   return decodeMSEW(MSEW);
 }
 
+inline static unsigned getMaccq(unsigned MType) {
+  unsigned Maccq = (MType >> 3) & 0x1;
+  return Maccq;
+}
+
+inline static unsigned getMopi(unsigned MOpiType) {
+  unsigned mopi = MOpiType;
+  return mopi;
+}
+
+inline static unsigned getMtr(unsigned MTrType) {
+  unsigned mtr = MTrType & 0x1;
+  return mtr;
+}
+
 inline static bool isTailAgnostic(unsigned VType) { return VType & 0x40; }
 
 inline static bool isMaskAgnostic(unsigned VType) { return VType & 0x80; }
@@ -556,6 +577,8 @@ void printVType(unsigned VType, raw_ostream &OS);
 unsigned getSEWLMULRatio(unsigned SEW, RISCVII::VLMUL VLMul);
 
 void printMType(unsigned MType, raw_ostream &OS);
+
+void printMOpiType(unsigned MOpiType, raw_ostream &OS);
 
 } // namespace RISCVVType
 
