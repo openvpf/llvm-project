@@ -164,6 +164,7 @@ class RISCVAsmParser : public MCTargetAsmParser {
   OperandMatchResultTy parseJALOffset(OperandVector &Operands);
   OperandMatchResultTy parseVTypeI(OperandVector &Operands);
   OperandMatchResultTy parseMTypeI(OperandVector &Operands);
+  OperandMatchResultTy parseMopi(OperandVector &Operands);
   OperandMatchResultTy parseMaskReg(OperandVector &Operands);
 
   bool parseOperand(OperandVector &Operands, StringRef Mnemonic);
@@ -265,6 +266,7 @@ struct RISCVOperand : public MCParsedAsmOperand {
     SystemRegister,
     VType,
     MType,
+    MOpiType,
   } Kind;
 
   bool IsRV64;
@@ -278,6 +280,10 @@ struct RISCVOperand : public MCParsedAsmOperand {
   };
 
   struct MTypeOp {
+    unsigned Val;
+  };
+
+  struct MOpiTypeOp {
     unsigned Val;
   };
 
@@ -301,6 +307,7 @@ struct RISCVOperand : public MCParsedAsmOperand {
     struct SysRegOp SysReg;
     struct VTypeOp VType;
     struct MTypeOp MType;
+    struct MOpiTypeOp MOpiType;
   };
 
   RISCVOperand(KindTy K) : MCParsedAsmOperand(), Kind(K) {}
@@ -330,6 +337,9 @@ public:
     case KindTy::MType:
       MType = o.MType;
       break;
+    case KindTy::MOpiType:
+      MOpiType = o.MOpiType;
+      break;
     }
   }
 
@@ -343,6 +353,7 @@ public:
   bool isSystemRegister() const { return Kind == KindTy::SystemRegister; }
   bool isVType() const { return Kind == KindTy::VType; }
   bool isMType() const { return Kind == KindTy::MType; }
+  bool isMopi() const { return Kind == KindTy::MOpiType; }
 
   bool isGPR() const {
     return Kind == KindTy::Register &&
@@ -782,6 +793,11 @@ public:
     return MType.Val;
   }
 
+  unsigned getMOpiType() const {
+    assert(Kind == KindTy::MOpiType && "Invalid type access!");
+    return MOpiType.Val;
+  }
+
   void print(raw_ostream &OS) const override {
     auto RegName = [](unsigned Reg) {
       if (Reg)
@@ -811,6 +827,11 @@ public:
     case KindTy::MType:
       OS << "<mtype: ";
       RISCVVType::printMType(getMType(), OS);
+      OS << '>';
+      break;
+    case KindTy::MOpiType:
+      OS << "<mopitype: ";
+      RISCVVType::printMOpiType(getMOpiType(), OS);
       OS << '>';
       break;
     }
@@ -849,7 +870,16 @@ public:
   static std::unique_ptr<RISCVOperand> createMType(unsigned MTypeI, SMLoc S,
                                                    bool IsRV64) {
     auto Op = std::make_unique<RISCVOperand>(KindTy::MType);
-    Op->VType.Val = MTypeI;
+    Op->MType.Val = MTypeI;
+    Op->StartLoc = S;
+    Op->IsRV64 = IsRV64;
+    return Op;
+  }
+
+  static std::unique_ptr<RISCVOperand> createMopiType(unsigned Mopi, SMLoc S,
+                                                   bool IsRV64) {
+    auto Op = std::make_unique<RISCVOperand>(KindTy::MOpiType);
+    Op->MOpiType.Val = Mopi;
     Op->StartLoc = S;
     Op->IsRV64 = IsRV64;
     return Op;
@@ -928,6 +958,11 @@ public:
   void addMTypeIOperands(MCInst &Inst, unsigned N) const {
     assert(N == 1 && "Invalid number of operands!");
     Inst.addOperand(MCOperand::createImm(getMType()));
+  }
+
+  void addMopiOperands(MCInst &Inst, unsigned N) const {
+    assert(N == 1 && "Invalid number of operands!");
+    Inst.addOperand(MCOperand::createImm(getMOpiType()));
   }
 
   void addCSRSystemRegisterOperands(MCInst &Inst, unsigned N) const {
@@ -1241,6 +1276,13 @@ bool RISCVAsmParser::MatchAndEmitInstruction(SMLoc IDLoc, unsigned &Opcode,
         ErrorLoc,
         "operand must be "
         "e[8|16|32|64|128|256|512|1024]");
+  }
+  case Match_InvalidMopi: {
+    SMLoc ErrorLoc = ((RISCVOperand &)*Operands[ErrorInfo]).getStartLoc();
+    return Error(
+        ErrorLoc,
+        "operand must be "
+        "mt[a|b|c], mtr[|none]");
   }
   case Match_InvalidVMaskRegister: {
     SMLoc ErrorLoc = ((RISCVOperand &)*Operands[ErrorInfo]).getStartLoc();
@@ -1744,6 +1786,62 @@ MatchFail:
   while (!MTypeIElements.empty())
     getLexer().UnLex(MTypeIElements.pop_back_val());
   return MatchOperand_NoMatch;
+}
+
+OperandMatchResultTy RISCVAsmParser::parseMopi(OperandVector &Operands) {
+  SMLoc S = getLoc();
+  if (getLexer().isNot(AsmToken::Identifier))
+    return MatchOperand_NoMatch;
+
+  SmallVector<AsmToken, 7> MopiElement;
+  // Put all the tokens for mtypei operand into VTypeIElements vector.
+  while (getLexer().isNot(AsmToken::EndOfStatement)) {
+    MopiElement.push_back(getLexer().getTok());
+    getLexer().Lex();
+    if (getLexer().is(AsmToken::EndOfStatement))
+      break;
+    if (getLexer().isNot(AsmToken::Comma))
+      goto MatchFail;
+    AsmToken Comma = getLexer().getTok();
+    MopiElement.push_back(Comma);
+    getLexer().Lex();
+  }
+
+  if (MopiElement.size() == 1 || MopiElement.size() == 3) {
+    StringRef Name = MopiElement[0].getIdentifier();
+    unsigned mopi;
+    if (Name == "mta")
+      mopi = 1;
+    else if (Name == "mtb")
+      mopi = 2;
+    else if (Name == "mtc")
+      mopi = 0;
+    else
+      goto MatchFail;
+    
+    bool mtr = false; 
+    if (MopiElement.size() == 3) {
+      StringRef Name = MopiElement[2].getIdentifier();
+      Name = MopiElement[2].getIdentifier();
+      if (Name == "mtr")
+        mtr = true;
+      else if (Name == "none")
+        mtr = false;
+      else
+        goto MatchFail;
+    }
+
+
+    unsigned Mopi =
+        RISCVVType::encodeMopi(mopi, mtr);
+    Operands.push_back(RISCVOperand::createMopiType(Mopi, S, isRV64()));
+    return MatchOperand_Success;
+  }
+
+  MatchFail:
+    while (!MopiElement.empty())
+      getLexer().UnLex(MopiElement.pop_back_val());
+    return MatchOperand_NoMatch;
 }
 
 OperandMatchResultTy RISCVAsmParser::parseMaskReg(OperandVector &Operands) {
