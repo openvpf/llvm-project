@@ -1360,20 +1360,20 @@ def MFWREDSUM_MVC : MREDUCE<0b1110, 0b01010, 1, "mfwredsum.mvc">;
 
 
  
-def MFNCVTC_F_FW_M : MREDUCE<0b1111, 0b00000, 1, "mfncvtc.f.fw.m">;
-def MFWCVTC_FW_F_M : MREDUCE<0b1111, 0b00000, 0, "mfwcvtc.fw.f.m">;
-def MFCVTC_F_X_M   : MREDUCE<0b1111, 0b00001, 1, "mfcvtc.f.x.m">;
-def MFCVTC_X_F_M   : MREDUCE<0b1111, 0b00001, 0, "mfcvtc.x.f.m">;
-def MFNCVTC_F_XW_M : MREDUCE<0b1111, 0b00010, 1, "mfncvtc.f.xw.m">;
-def MFWCVTC_XW_F_M : MREDUCE<0b1111, 0b00010, 0, "mfwcvtc.xw.f.m">;
-def MFNCVTC_F_XQ_M : MREDUCE<0b1111, 0b00011, 1, "mfncvtc.f.xq.m">;
-def MFWCVTC_XQ_F_M : MREDUCE<0b1111, 0b00011, 0, "mfwcvtc.xq.f.m">;
-def MFWCVTC_FW_X_M : MREDUCE<0b1111, 0b00100, 1, "mfwcvtc.fw.x.m">;
-def MFNCVTC_X_FW_M : MREDUCE<0b1111, 0b00100, 0, "mfncvtc.x.fw.m">;
-def MFCVTC_FW_XW_M : MREDUCE<0b1111, 0b00101, 1, "mfcvtc.fw.xw.m">;
-def MFCVTC_XW_FW_M : MREDUCE<0b1111, 0b00101, 0, "mfcvtc.xw.fw.m">;
-def MFNCVTC_FW_XQ_M: MREDUCE<0b1111, 0b00110, 1, "mfncvtc.fw.xq.m">;
-def MFWCVTC_XQ_FW_M: MREDUCE<0b1111, 0b00110, 0, "mfwcvtc.xq.fw.m">;
+def MFNCVT_F_FW_M : MREDUCE<0b1111, 0b00000, 1, "mfncvt.f.fw.m">;
+def MFWCVT_FW_F_M : MREDUCE<0b1111, 0b00000, 0, "mfwcvt.fw.f.m">;
+def MFCVT_F_X_M   : MREDUCE<0b1111, 0b00001, 1, "mfcvt.f.x.m">;
+def MFCVT_X_F_M   : MREDUCE<0b1111, 0b00001, 0, "mfcvt.x.f.m">;
+def MFNCVT_F_XW_M : MREDUCE<0b1111, 0b00010, 1, "mfncvt.f.xw.m">;
+def MFWCVT_XW_F_M : MREDUCE<0b1111, 0b00010, 0, "mfwcvt.xw.f.m">;
+def MFNCVT_F_XQ_M : MREDUCE<0b1111, 0b00011, 1, "mfncvt.f.xq.m">;
+def MFWCVT_XQ_F_M : MREDUCE<0b1111, 0b00011, 0, "mfwcvt.xq.f.m">;
+def MFWCVT_FW_X_M : MREDUCE<0b1111, 0b00100, 1, "mfwcvt.fw.x.m">;
+def MFNCVT_X_FW_M : MREDUCE<0b1111, 0b00100, 0, "mfncvt.x.fw.m">;
+def MFCVT_FW_XW_M : MREDUCE<0b1111, 0b00101, 1, "mfcvt.fw.xw.m">;
+def MFCVT_XW_FW_M : MREDUCE<0b1111, 0b00101, 0, "mfcvt.xw.fw.m">;
+def MFNCVT_FW_XQ_M: MREDUCE<0b1111, 0b00110, 1, "mfncvt.fw.xq.m">;
+def MFWCVT_XQ_FW_M: MREDUCE<0b1111, 0b00110, 0, "mfwcvt.xq.fw.m">;
 
 def MMV_M_I        : MMoveI<0b1111, 0b01000, "mmv.m.i">;
 def MMV_M_X        : MMoveX<0b1111, 0b01001, 0, "mmv.m.x">;
@@ -1381,6 +1381,9 @@ def MMV_M_F        : MMoveX<0b1111, 0b01001, 1, "mmv.m.f">;
 def MMV_M_V_R      : MMoveV<0b1111, 0b01010, 0, "mmv.m.v.r">;
 def MMV_M_V_C      : MMoveV<0b1111, 0b01011, 0, "mmv.m.v.c">;
 def MMV_M_M        : MREDUCE<0b1111, 0b01100, 0, "mmv.m.m">;
+
+def MFEXP_M        : MREDUCE<0b1111, 0b10001, 1, "mfexp.m">;
+def MFRSQRT_M      : MREDUCE<0b1111, 0b10010, 1, "mfrsqrt.m">;
 
 
 // Vector Single-Width Integer Add and Subtract
