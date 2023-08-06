@@ -1377,7 +1377,7 @@ def MFWCVT_XQ_FW_M: MREDUCE<0b1111, 0b00110, 0, "mfwcvt.xq.fw.m">;
 
 def MMV_M_I        : MMoveI<0b1111, 0b01000, "mmv.m.i">;
 def MMV_M_X        : MMoveX<0b1111, 0b01001, 0, "mmv.m.x">;
-def MMV_M_F        : MMoveX<0b1111, 0b01001, 1, "mmv.m.f">;
+def MMV_M_F        : MMoveF<0b1111, 0b01001, 1, "mmv.m.f">;
 def MMV_M_V_R      : MMoveV<0b1111, 0b01010, 0, "mmv.m.v.r">;
 def MMV_M_V_C      : MMoveV<0b1111, 0b01011, 0, "mmv.m.v.c">;
 def MMV_M_M        : MREDUCE<0b1111, 0b01100, 0, "mmv.m.m">;
