@@ -457,35 +457,6 @@ class VIndexedSegmentStore<bits<3> nf, RISCVMOP mop, RISCVWidth width,
 } // hasSideEffects = 0, mayLoad = 0, mayStore = 1
 
 
-let hasSideEffects = 0, mayLoad = 1, mayStore = 0 in {
-// load td, (rs1), rs2
-class MatrixLoad<bits<3> funct6, bits<3> width, string opcodestr>
-    : RVInstML<funct6, width,
-                (outs TRR:$td),
-                (ins GPR:$rs1, GPR:$rs2, MopiOp:$mopi), opcodestr,
-                "$td, (${rs1}), $rs2, $mopi">;
-
-class MatrixUFLoad<bits<4> funct6, bits<3> width, string opcodestr>
-    : RVInstUFML<funct6, width,
-                (outs TRR:$td),
-                (ins GPR:$rs1, GPR:$rs2, MopiOp:$mopi), opcodestr,
-                "$td, (${rs1}), $rs2, $mopi">;
-} // hasSideEffects = 0, mayLoad = 1, mayStore = 0
-
-
-let hasSideEffects = 0, mayLoad = 0, mayStore = 1 in {
-// store vd, ts3, (rs1), rs2
-class MatrixStore<bits<3> funct6, bits<3> width, string opcodestr>
-    : RVInstMS<funct6, width, (outs),
-                (ins TRR:$tr3, GPR:$rs1, GPR:$rs2, MopiOp:$mopi),
-                opcodestr, "$tr3, (${rs1}), $rs2, $mopi">;
-
-class MatrixUFStore<bits<4> funct6, bits<3> width, string opcodestr>
-    : RVInstUFMS<funct6, width, (outs),
-                (ins TRR:$tr3, GPR:$rs1, GPR:$rs2, MopiOp:$mopi),
-                opcodestr, "$tr3, (${rs1}), $rs2, $mopi">;
-} // hasSideEffects = 0, mayLoad = 0, mayStore = 1
-
 let hasSideEffects = 0, mayLoad = 0, mayStore = 0 in {
 // op vd, vs2, vs1, vm
 class VALUVV<bits<6> funct6, RISCVVFormat opv, string opcodestr>
@@ -1190,24 +1161,6 @@ def MLE8_M        : MatrixLoad<0b000,   0x0, "mle8.m">,   VLSSched<8>;
 def MLE16_M       : MatrixLoad<0b000,   0x1, "mle16.m">,  VLSSched<8>;
 def MLE32_M       : MatrixLoad<0b000,   0x2, "mle32.m">,  VLSSched<8>;
 def MLE64_M       : MatrixLoad<0b000,   0x3, "mle64.m">,  VLSSched<8>;
-
-def MSE8_M        : MatrixStore<0b000,  0x0, "mse8.m">,   VLSSched<8>;
-def MSE16_M       : MatrixStore<0b000,  0x1, "mse16.m">,  VLSSched<8>;
-def MSE32_M       : MatrixStore<0b000,  0x2, "mse32.m">,  VLSSched<8>;
-def MSE64_M       : MatrixStore<0b000,  0x3, "mse64.m">,  VLSSched<8>;
-
-
-def MLUFE8_M      : MatrixUFLoad<0b1100,   0x0, "mlufe8.m">,   VLSSched<8>;
-def MLUFE16_M     : MatrixUFLoad<0b1100,   0x1, "mlufe16.m">,  VLSSched<8>;
-def MLUFE32_M     : MatrixUFLoad<0b1100,   0x2, "mlufe32.m">,  VLSSched<8>;
-def MLUFE64_M     : MatrixUFLoad<0b1100,   0x3, "mlufe64.m">,  VLSSched<8>;
-
-
-def MSUFE8_M    : MatrixUFStore<0x0b1100,   0x0, "msufe8.m">,   VLSSched<8>;
-def MSUFE16_M   : MatrixUFStore<0x0b1100,   0x1, "msufe16.m">,  VLSSched<8>;
-def MSUFE32_M   : MatrixUFStore<0x0b1100,   0x2, "msufe32.m">,  VLSSched<8>;
-def MSUFE64_M   : MatrixUFStore<0x0b1100,   0x3, "msufe64.m">,  VLSSched<8>;
-
 
 defm VL1R : VWholeLoad1<"vl1r", VR>;
 defm VL2R : VWholeLoad2<"vl2r", VRM2>;
