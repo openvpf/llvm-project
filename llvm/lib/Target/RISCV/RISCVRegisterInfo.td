@@ -481,6 +481,8 @@ let RegAltNameIndices = [ABIRegAltName] in {
   def MSTDI  : RISCVReg<0, "mstdi",  ["mstdi"]>;
   def MINSK  : RISCVReg<0, "minsk",  ["minsk"]>;
   def MOUTSK : RISCVReg<0, "moutsk", ["moutsk"]>;
+
+  def MSPIDX : RISCVReg<0, "mspidx", ["mspidx"]>;
 }
 
 foreach Index = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22,

@@ -510,7 +510,7 @@ inline static bool isValidLMUL(unsigned LMUL, bool Fractional) {
 unsigned encodeVTYPE(RISCVII::VLMUL VLMUL, unsigned SEW, bool TailAgnostic,
                      bool MaskAgnostic);
 
-unsigned encodeMTYPE(unsigned SEW, bool maccq);
+unsigned encodeMTYPE(unsigned SEW, bool maccq, bool sp24);
 unsigned encodeMopi(unsigned mopi, bool mtr);
 
 
@@ -556,6 +556,11 @@ inline static unsigned getMSEW(unsigned MType) {
 inline static unsigned getMaccq(unsigned MType) {
   unsigned Maccq = (MType >> 3) & 0x1;
   return Maccq;
+}
+
+inline static unsigned getSp24(unsigned MType) {
+  unsigned sp24 = (MType >> 8) & 0x1;
+  return sp24;
 }
 
 inline static unsigned getMopi(unsigned MOpiType) {

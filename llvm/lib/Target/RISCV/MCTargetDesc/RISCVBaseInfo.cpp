@@ -159,12 +159,14 @@ unsigned RISCVVType::encodeVTYPE(RISCVII::VLMUL VLMUL, unsigned SEW,
 // Bits | Name       | Description
 // -----+------------+------------------------------------------------
 // 2:0  | msew[2:0]  | Standard element width (SEW) setting
-unsigned RISCVVType::encodeMTYPE(unsigned SEW, bool maccq) {
+unsigned RISCVVType::encodeMTYPE(unsigned SEW, bool maccq, bool sp24) {
   assert(isValidSEW(SEW) && "Invalid SEW");
   unsigned MSEWBits = Log2_32(SEW) - 3;
   unsigned MTypeI = (MSEWBits & 0x7);
   if (maccq)
     MTypeI |= (1 << 3);
+  if (sp24)
+    MTypeI |= (1 << 8);
 
   return MTypeI;
 }
@@ -344,7 +346,15 @@ void RISCVVType::printMType(unsigned MType, raw_ostream &OS) {
     OS << ", maccq";
   else
     OS << ", maccd";
+  
+  unsigned sp24 = getSp24(MType);
+  if (sp24)
+    OS << ", sp24";
+  else
+    OS << ", normal";
+
 }
+
 
 void RISCVVType::printMOpiType(unsigned MOpiType, raw_ostream &OS) {
   unsigned mopiTr = getMopi(MOpiType);

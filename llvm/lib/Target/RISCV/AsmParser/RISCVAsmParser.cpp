@@ -2417,7 +2417,7 @@ ParseStatus RISCVAsmParser::parseMTypeI(OperandVector &Operands) {
     getLexer().Lex();
   }
 
-  if (MTypeIElements.size() == 3 || MTypeIElements.size() == 1) {
+  if (MTypeIElements.size() == 5 || MTypeIElements.size() == 3 || MTypeIElements.size() == 1) {
     // The MTypeIElements layout is:
     // SEW comma maccq
     //  0    1    2    
@@ -2430,20 +2430,36 @@ ParseStatus RISCVAsmParser::parseMTypeI(OperandVector &Operands) {
     if (!RISCVVType::isValidSEW(Sew))
       goto MatchFail;
 
-    bool MatrixAccQ = false; 
+    bool MatrixAccQ = false;
+    bool sparse24 = false;
     if (MTypeIElements.size() == 3) {
       Name = MTypeIElements[2].getIdentifier();
       if (Name == "maccq")
         MatrixAccQ = true;
       else if (Name == "maccd")
         MatrixAccQ = false;
+      else if (Name == "sp24")
+        sparse24 =  true;
+      else
+        goto MatchFail;
+    }
+
+    if (MTypeIElements.size() == 5) {
+      Name = MTypeIElements[4].getIdentifier();
+      if (Name == "maccq")
+        MatrixAccQ = true;
+      else if (Name == "maccd")
+        MatrixAccQ = false;
+      else if (Name == "sp24")
+        sparse24 =  true;
       else
         goto MatchFail;
     }
 
 
+
     unsigned MTypeI =
-        RISCVVType::encodeMTYPE(Sew, MatrixAccQ);
+        RISCVVType::encodeMTYPE(Sew, MatrixAccQ, sparse24);
     Operands.push_back(RISCVOperand::createMType(MTypeI, S, isRV64()));
     return ParseStatus::Success;
   }
