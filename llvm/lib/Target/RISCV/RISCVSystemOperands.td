@@ -393,9 +393,9 @@ def : SysReg<"vlenb", 0xC22>;
 // User Matrix CSRs
 //===-----------------------------------------------
 def : SysReg<"mtype", 0xC43>;
-def : SysReg<"tile_m", 0xC40>;
-def : SysReg<"tile_k", 0xC42>;
-def : SysReg<"tile_n", 0xC41>;
+def : SysReg<"tilem", 0xC40>;
+def : SysReg<"tilek", 0xC42>;
+def : SysReg<"tilen", 0xC41>;
 def : SysReg<"mlenb",  0xC44>;
 def : SysReg<"moutsh", 0xC45>;
 def : SysReg<"minsh", 0xC46>;
@@ -404,4 +404,4 @@ def : SysReg<"mstdi", 0xC48>;
 def : SysReg<"minsk", 0xC49>;
 def : SysReg<"moutsk", 0xC50>;
 
-def : SysReg<"mlut", 0xC51>;
+def : SysReg<"mspidx", 0xC51>;
