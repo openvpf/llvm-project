@@ -297,6 +297,25 @@ class RVInstWidenADDSUB<bits<4> funct6, bit fp, bits<3> tt, dag outs, dag ins,
   let Uses = [MTYPE, TILEM, TILEK, TILEN];
 }
 
+
+class RVInstWiden<bits<6> funct6, bit fp, bits<3> tt, dag outs, dag ins,
+               string opcodestr, string argstr>
+    : RVInst<outs, ins, opcodestr, argstr, [], InstFormatR> {
+  bits<5> ts1;
+  bits<5> ts2;
+  bits<5> td;
+
+  let Inst{31-26} = funct6;
+  let Inst{25} = fp;
+  let Inst{24-20} = ts2;
+  let Inst{19-15} = ts1;
+  let Inst{14-12} = tt;
+  let Inst{11-7} = td;
+  let Opcode = OPC_OP_M.Value;
+
+  let Uses = [MTYPE, TILEM, TILEK, TILEN];
+}
+
 class RVInstADDSUBMX<bits<4> funct6, bit fp, bits<3> tt, dag outs, dag ins,
                string opcodestr, string argstr>
     : RVInst<outs, ins, opcodestr, argstr, [], InstFormatR> {

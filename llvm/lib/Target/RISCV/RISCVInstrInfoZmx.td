@@ -120,8 +120,8 @@ class ADDSUBMF<bits<4> funct6, bit fp, string opcodestr>
                 (ins TRR:$ts1, FPR32:$rs2, MopiOp:$mopi),
                 opcodestr, "$td, $ts1, $rs2, $mopi">;
 
-class WADDSUBMM<bits<4> funct6, bit fp, string opcodestr>
-    : RVInstWidenADDSUB<funct6, fp, 0b110, (outs TRR:$td),
+class WADDSUBMM<bits<6> funct6, bit fp, string opcodestr>
+    : RVInstWiden<funct6, fp, 0b110, (outs TRR:$td),
                       (ins TRR:$ts1, TRR:$ts2, MopiOp:$mopi),
                       opcodestr, "$td, $ts1, $ts2, $mopi">;
 
@@ -293,14 +293,14 @@ def MMACC_MM    :  ADDSUBMM<0b0100, 0, "mmacc.mm">;
 def MMSAC_MM    :  ADDSUBMM<0b0101, 0, "mmsac.mm">;
 def MNMACC_MM   :  ADDSUBMM<0b0110, 0, "mnmacc.mm">;
 def MNMSAC_MM   :  ADDSUBMM<0b0111, 0, "mnmsac.mm">;
-def MWADD_MM    : WADDSUBMM<0b0000, 0, "mwadd.mm">;
-def MWSUB_MM    : WADDSUBMM<0b0001, 0, "mwsub.mm">;
-def MWRSUB_MM   : WADDSUBMM<0b0010, 0, "mwrsub.mm">;
-def MWEMUL_MM   : WADDSUBMM<0b0011, 0, "mwemul.mm">;
-def MWMACC_MM   : WADDSUBMM<0b0100, 0, "mwmacc.mm">;
-def MWMSAC_MM   : WADDSUBMM<0b0101, 0, "mwmsac.mm">;
-def MWNMACC_MM  : WADDSUBMM<0b0110, 0, "mwnmacc.mm">;
-def MWNMSAC_MM  : WADDSUBMM<0b0111, 0, "mwnmsac.mm">;
+def MWADD_MM    : WADDSUBMM<0b000011, 0, "mwadd.mm">;
+def MWSUB_MM    : WADDSUBMM<0b000111, 0, "mwsub.mm">;
+def MWRSUB_MM   : WADDSUBMM<0b001011, 0, "mwrsub.mm">;
+def MWEMUL_MM   : WADDSUBMM<0b001111, 0, "mwemul.mm">;
+def MWMACC_MM   : WADDSUBMM<0b010011, 0, "mwmacc.mm">;
+def MWMSAC_MM   : WADDSUBMM<0b010111, 0, "mwmsac.mm">;
+def MWNMACC_MM  : WADDSUBMM<0b011011, 0, "mwnmacc.mm">;
+def MWNMSAC_MM  : WADDSUBMM<0b011111, 0, "mwnmsac.mm">;
 def MDIV_MM     :  ADDSUBMM<0b1000, 0, "mdiv.mm">;
 def MREM_MM     :  ADDSUBMM<0b1001, 0, "mrem.mm">;
 def MMAX_MM     :  ADDSUBMM<0b1010, 0, "mmax.mm">;
@@ -313,14 +313,14 @@ def MFMACC_MM   :  ADDSUBMM<0b0100, 1, "mfmacc.mm">;
 def MFMSAC_MM   :  ADDSUBMM<0b0101, 1, "mfmsac.mm">;
 def MFNMACC_MM  :  ADDSUBMM<0b0110, 1, "mfnmacc.mm">;
 def MFNMSAC_MM  :  ADDSUBMM<0b0111, 1, "mfnmsac.mm">;
-def MFWADD_MM   : WADDSUBMM<0b0000, 1, "mfwadd.mm">;
-def MFWSUB_MM   : WADDSUBMM<0b0001, 1, "mfwsub.mm">;
-def MFWRSUB_MM  : WADDSUBMM<0b0010, 1, "mfwrsub.mm">;
-def MFWEMUL_MM  : WADDSUBMM<0b0011, 1, "mfwemul.mm">;
-def MFWMACC_MM  : WADDSUBMM<0b0100, 1, "mfwmacc.mm">;
-def MFWMSAC_MM  : WADDSUBMM<0b0101, 1, "mfwmsac.mm">;
-def MFWNMACC_MM : WADDSUBMM<0b0110, 1, "mfwnmacc.mm">;
-def MFWNMSAC_MM : WADDSUBMM<0b0111, 1, "mfwnmsac.mm">;
+def MFWADD_MM   : WADDSUBMM<0b000011, 1, "mfwadd.mm">;
+def MFWSUB_MM   : WADDSUBMM<0b000111, 1, "mfwsub.mm">;
+def MFWRSUB_MM  : WADDSUBMM<0b001011, 1, "mfwrsub.mm">;
+def MFWEMUL_MM  : WADDSUBMM<0b001111, 1, "mfwemul.mm">;
+def MFWMACC_MM  : WADDSUBMM<0b010011, 1, "mfwmacc.mm">;
+def MFWMSAC_MM  : WADDSUBMM<0b010111, 1, "mfwmsac.mm">;
+def MFWNMACC_MM : WADDSUBMM<0b011011, 1, "mfwnmacc.mm">;
+def MFWNMSAC_MM : WADDSUBMM<0b011111, 1, "mfwnmsac.mm">;
 def MFDIV_MM    :  ADDSUBMM<0b1000, 1, "mfdiv.mm">;
 def MFMAX_MM    :  ADDSUBMM<0b1010, 1, "mfmax.mm">;
 def MFMIN_MM    :  ADDSUBMM<0b1011, 1, "mfmin.mm">;
@@ -525,5 +525,5 @@ def MFQUANT_MVC    :  ADDSUBMVC<0b1111, 1, "mfquant.mvc">;
 def MFDEANT_MVC    : WADDSUBMVC<0b1111, 1, "mfdeqnt.mvc">;
 def MFQUANT_MVR    :  ADDSUBMVR<0b1111, 1, "mfquant.mvr">;
 def MFDEANT_MVR    : WADDSUBMVR<0b1111, 1, "mfdeqnt.mvr">;
-def MQMAQ_MM       :  WADDSUBMM<0b1110, 0, "mqmaq.mvr">;
+def MQMAQ_MM       :  WADDSUBMM<0b111011, 0, "mqmaq.mvr">;
 }
