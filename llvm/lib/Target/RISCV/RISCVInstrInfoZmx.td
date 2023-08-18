@@ -112,7 +112,7 @@ class ADDSUBMVC<bits<4> funct6, bit fp, string opcodestr>
 
 class ADDSUBMX<bits<4> funct6, bit fp, string opcodestr>
     : RVInstADDSUBMX<funct6, fp, 0b011, (outs TRR:$td),
-                (ins TRR:$ts1, GPR32:$rs2, MopiOp:$mopi),
+                (ins TRR:$ts1, GPR:$rs2, MopiOp:$mopi),
                 opcodestr, "$td, $ts1, $rs2, $mopi">;
 
 class ADDSUBMF<bits<4> funct6, bit fp, string opcodestr>
@@ -137,7 +137,7 @@ class WADDSUBMVC<bits<4> funct6, bit fp, string opcodestr>
 
 class WADDSUBMX<bits<4> funct6, bit fp, string opcodestr>
     : RVInstWidenADDSUBMX<funct6, fp, 0b011, (outs TRR:$td),
-                (ins TRR:$ts1, GPR32:$rs2, MopiOp:$mopi),
+                (ins TRR:$ts1, GPR:$rs2, MopiOp:$mopi),
                 opcodestr, "$td, $ts1, $rs2, $mopi">;
 
 class WADDSUBMF<bits<4> funct6, bit fp, string opcodestr>
