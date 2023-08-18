@@ -121,27 +121,27 @@ class ADDSUBMF<bits<4> funct6, bit fp, string opcodestr>
                 opcodestr, "$td, $ts1, $rs2, $mopi">;
 
 class WADDSUBMM<bits<6> funct6, bit fp, string opcodestr>
-    : RVInstWiden<funct6, fp, 0b110, (outs TRR:$td),
+    : RVInstWidenMM<funct6, fp, 0b110, (outs TRR:$td),
                       (ins TRR:$ts1, TRR:$ts2, MopiOp:$mopi),
                       opcodestr, "$td, $ts1, $ts2, $mopi">;
 
-class WADDSUBMVR<bits<4> funct6, bit fp, string opcodestr>
-    : RVInstWidenADDSUB<funct6, fp, 0b101, (outs TRR:$td),
+class WADDSUBMVR<bits<6> funct6, bit fp, string opcodestr>
+    : RVInstWidenMM<funct6, fp, 0b101, (outs TRR:$td),
                 (ins TRR:$ts1, TRR:$ts2, MopiOp:$mopi),
                 opcodestr, "$td, $ts1, $ts2, $mopi">;
 
-class WADDSUBMVC<bits<4> funct6, bit fp, string opcodestr>
-    : RVInstWidenADDSUB<funct6, fp, 0b100, (outs TRR:$td),
+class WADDSUBMVC<bits<6> funct6, bit fp, string opcodestr>
+    : RVInstWidenMM<funct6, fp, 0b100, (outs TRR:$td),
                 (ins TRR:$ts1, TRR:$ts2, MopiOp:$mopi),
                 opcodestr, "$td, $ts1, $ts2, $mopi">;
 
-class WADDSUBMX<bits<4> funct6, bit fp, string opcodestr>
-    : RVInstWidenADDSUBMX<funct6, fp, 0b011, (outs TRR:$td),
+class WADDSUBMX<bits<6> funct6, bit fp, string opcodestr>
+    : RVInstWidenMX<funct6, fp, 0b011, (outs TRR:$td),
                 (ins TRR:$ts1, GPR:$rs2, MopiOp:$mopi),
                 opcodestr, "$td, $ts1, $rs2, $mopi">;
 
-class WADDSUBMF<bits<4> funct6, bit fp, string opcodestr>
-    : RVInstWidenADDSUBMX<funct6, fp, 0b011, (outs TRR:$td),
+class WADDSUBMF<bits<6> funct6, bit fp, string opcodestr>
+    : RVInstWidenMX<funct6, fp, 0b011, (outs TRR:$td),
                 (ins TRR:$ts1, FPR32:$rs2, MopiOp:$mopi),
                 opcodestr, "$td, $ts1, $rs2, $mopi">;
 
@@ -171,7 +171,7 @@ class MMoveI<bits<4> funct6, bits<5> mode, string opcodestr>
                 (ins uimm5:$mimm5, MopiOp:$mopi),
                 opcodestr, "$td, $mimm5, $mopi">;
 
-class MMoveWidenI<bits<4> funct6, bits<5> mode, string opcodestr>
+class MMoveWidenI<bits<6> funct6, bits<5> mode, string opcodestr>
     : RVInstMoveWidenMI<funct6, mode, (outs TRR:$td),
                         (ins uimm5:$mimm5, MopiOp:$mopi),
                         opcodestr, "$td, $mimm5, $mopi">;
@@ -181,7 +181,7 @@ class MMoveX<bits<4> funct6, bits<5> mode, bit fp, string opcodestr>
                 (ins GPR:$rs1, MopiOp:$mopi),
                 opcodestr, "$td, $rs1, $mopi">;
 
-class MMoveWidenX<bits<4> funct6, bits<5> mode, bit fp, string opcodestr>
+class MMoveWidenX<bits<6> funct6, bits<5> mode, bit fp, string opcodestr>
     : RVInstMoveWidenMX<funct6, fp, mode, (outs TRR:$td),
                 (ins GPR:$rs1, MopiOp:$mopi),
                 opcodestr, "$td, $rs1, $mopi">;
@@ -191,12 +191,12 @@ class MMoveF<bits<4> funct6, bits<5> mode, bit fp, string opcodestr>
                 (ins FPR32:$rs1, MopiOp:$mopi),
                 opcodestr, "$td, $rs1, $mopi">;
 
-class MMoveWidenF<bits<4> funct6, bits<5> mode, bit fp, string opcodestr>
+class MMoveWidenF<bits<6> funct6, bits<5> mode, bit fp, string opcodestr>
     : RVInstMoveWidenMX<funct6, fp, mode, (outs TRR:$td),
                 (ins FPR32:$rs1, MopiOp:$mopi),
                 opcodestr, "$td, $rs1, $mopi">;
 
-class MMoveWidenMM<bits<4> funct6, bits<5> mode, bit fp, string opcodestr>
+class MMoveWidenMM<bits<6> funct6, bits<5> mode, bit fp, string opcodestr>
     : RVInstMoveWidenMM<funct6, fp, mode, (outs TRR:$td),
                 (ins FPR32:$rs1, MopiOp:$mopi),
                 opcodestr, "$td, $rs1, $mopi">;
@@ -334,14 +334,14 @@ def MMACC_MVR    :  ADDSUBMVR<0b0100, 0, "mmacc.mvr">;
 def MMSAC_MVR    :  ADDSUBMVR<0b0101, 0, "mmsac.mvr">;
 def MNMACC_MVR   :  ADDSUBMVR<0b0110, 0, "mnmacc.mvr">;
 def MNMSAC_MVR   :  ADDSUBMVR<0b0111, 0, "mnmsac.mvr">;
-def MWADD_MVR    : WADDSUBMVR<0b0000, 0, "mwadd.mvr">;
-def MWSUB_MVR    : WADDSUBMVR<0b0001, 0, "mwsub.mvr">;
-def MWRSUB_MVR   : WADDSUBMVR<0b0010, 0, "mwrsub.mvr">;
-def MWEMUL_MVR   : WADDSUBMVR<0b0011, 0, "mwemul.mvr">;
-def MWMACC_MVR   : WADDSUBMVR<0b0100, 0, "mwmacc.mvr">;
-def MWMSAC_MVR   : WADDSUBMVR<0b0101, 0, "mwmsac.mvr">;
-def MWNMACC_MVR  : WADDSUBMVR<0b0110, 0, "mwnmacc.mvr">;
-def MWNMSAC_MVR  : WADDSUBMVR<0b0111, 0, "mwnmsac.mvr">;
+def MWADD_MVR    : WADDSUBMVR<0b000011, 0, "mwadd.mvr">;
+def MWSUB_MVR    : WADDSUBMVR<0b000111, 0, "mwsub.mvr">;
+def MWRSUB_MVR   : WADDSUBMVR<0b001011, 0, "mwrsub.mvr">;
+def MWEMUL_MVR   : WADDSUBMVR<0b001111, 0, "mwemul.mvr">;
+def MWMACC_MVR   : WADDSUBMVR<0b010011, 0, "mwmacc.mvr">;
+def MWMSAC_MVR   : WADDSUBMVR<0b010111, 0, "mwmsac.mvr">;
+def MWNMACC_MVR  : WADDSUBMVR<0b011011, 0, "mwnmacc.mvr">;
+def MWNMSAC_MVR  : WADDSUBMVR<0b011111, 0, "mwnmsac.mvr">;
 def MDIV_MVR     :  ADDSUBMVR<0b1000, 0, "mdiv.mvr">;
 def MREM_MVR     :  ADDSUBMVR<0b1001, 0, "mrem.mvr">;
 def MMAX_MVR     :  ADDSUBMVR<0b1010, 0, "mmax.mvr">;
@@ -354,14 +354,14 @@ def MFMACC_MVR   :  ADDSUBMVR<0b0100, 1, "mfmacc.mvr">;
 def MFMSAC_MVR   :  ADDSUBMVR<0b0101, 1, "mfmsac.mvr">;
 def MFNMACC_MVR  :  ADDSUBMVR<0b0110, 1, "mfnmacc.mvr">;
 def MFNMSAC_MVR  :  ADDSUBMVR<0b0111, 1, "mfnmsac.mvr">;
-def MFWADD_MVR   : WADDSUBMVR<0b0000, 1, "mfwadd.mvr">;
-def MFWSUB_MVR   : WADDSUBMVR<0b0001, 1, "mfwsub.mvr">;
-def MFWRSUB_MVR  : WADDSUBMVR<0b0010, 1, "mfwrsub.mvr">;
-def MFWEMUL_MVR  : WADDSUBMVR<0b0011, 1, "mfwemul.mvr">;
-def MFWMACC_MVR  : WADDSUBMVR<0b0100, 1, "mfwmacc.mvr">;
-def MFWMSAC_MVR  : WADDSUBMVR<0b0101, 1, "mfwmsac.mvr">;
-def MFWNMACC_MVR : WADDSUBMVR<0b0110, 1, "mfwnmacc.mvr">;
-def MFWNMSAC_MVR : WADDSUBMVR<0b0111, 1, "mfwnmsac.mvr">;
+def MFWADD_MVR   : WADDSUBMVR<0b000011, 1, "mfwadd.mvr">;
+def MFWSUB_MVR   : WADDSUBMVR<0b000111, 1, "mfwsub.mvr">;
+def MFWRSUB_MVR  : WADDSUBMVR<0b001011, 1, "mfwrsub.mvr">;
+def MFWEMUL_MVR  : WADDSUBMVR<0b001111, 1, "mfwemul.mvr">;
+def MFWMACC_MVR  : WADDSUBMVR<0b010011, 1, "mfwmacc.mvr">;
+def MFWMSAC_MVR  : WADDSUBMVR<0b010111, 1, "mfwmsac.mvr">;
+def MFWNMACC_MVR : WADDSUBMVR<0b011011, 1, "mfwnmacc.mvr">;
+def MFWNMSAC_MVR : WADDSUBMVR<0b011111, 1, "mfwnmsac.mvr">;
 def MFDIV_MVR    :  ADDSUBMVR<0b1000, 1, "mfdiv.mvr">;
 def MFMAX_MVR    :  ADDSUBMVR<0b1010, 1, "mfmax.mvr">;
 def MFMIN_MVR    :  ADDSUBMVR<0b1011, 1, "mfmin.mvr">;
@@ -374,14 +374,14 @@ def MMACC_MVC    :  ADDSUBMVC<0b0100, 0, "mmacc.mvc">;
 def MMSAC_MVC    :  ADDSUBMVC<0b0101, 0, "mmsac.mvc">;
 def MNMACC_MVC   :  ADDSUBMVC<0b0110, 0, "mnmacc.mvc">;
 def MNMSAC_MVC   :  ADDSUBMVC<0b0111, 0, "mnmsac.mvc">;
-def MWADD_MVC    : WADDSUBMVC<0b0000, 0, "mwadd.mvc">;
-def MWSUB_MVC    : WADDSUBMVC<0b0001, 0, "mwsub.mvc">;
-def MWRSUB_MVC   : WADDSUBMVC<0b0010, 0, "mwrsub.mvc">;
-def MWEMUL_MVC   : WADDSUBMVC<0b0011, 0, "mwemul.mvc">;
-def MWMACC_MVC   : WADDSUBMVC<0b0100, 0, "mwmacc.mvc">;
-def MWMSAC_MVC   : WADDSUBMVC<0b0101, 0, "mwmsac.mvc">;
-def MWNMACC_MVC  : WADDSUBMVC<0b0110, 0, "mwnmacc.mvc">;
-def MWNMSAC_MVC  : WADDSUBMVC<0b0111, 0, "mwnmsac.mvc">;
+def MWADD_MVC    : WADDSUBMVC<0b000011, 0, "mwadd.mvc">;
+def MWSUB_MVC    : WADDSUBMVC<0b000111, 0, "mwsub.mvc">;
+def MWRSUB_MVC   : WADDSUBMVC<0b001011, 0, "mwrsub.mvc">;
+def MWEMUL_MVC   : WADDSUBMVC<0b001111, 0, "mwemul.mvc">;
+def MWMACC_MVC   : WADDSUBMVC<0b010011, 0, "mwmacc.mvc">;
+def MWMSAC_MVC   : WADDSUBMVC<0b010111, 0, "mwmsac.mvc">;
+def MWNMACC_MVC  : WADDSUBMVC<0b011011, 0, "mwnmacc.mvc">;
+def MWNMSAC_MVC  : WADDSUBMVC<0b011111, 0, "mwnmsac.mvc">;
 def MDIV_MVC     :  ADDSUBMVC<0b1000, 0, "mdiv.mvc">;
 def MREM_MVC     :  ADDSUBMVC<0b1001, 0, "mrem.mvc">;
 def MMAX_MVC     :  ADDSUBMVC<0b1010, 0, "mmax.mvc">;
@@ -394,14 +394,14 @@ def MFMACC_MVC   :  ADDSUBMVC<0b0100, 1, "mfmacc.mvc">;
 def MFMSAC_MVC   :  ADDSUBMVC<0b0101, 1, "mfmsac.mvc">;
 def MFNMACC_MVC  :  ADDSUBMVC<0b0110, 1, "mfnmacc.mvc">;
 def MFNMSAC_MVC  :  ADDSUBMVC<0b0111, 1, "mfnmsac.mvc">;
-def MFWADD_MVC   : WADDSUBMVC<0b0000, 1, "mfwadd.mvc">;
-def MFWSUB_MVC   : WADDSUBMVC<0b0001, 1, "mfwsub.mvc">;
-def MFWRSUB_MVC  : WADDSUBMVC<0b0010, 1, "mfwrsub.mvc">;
-def MFWEMUL_MVC  : WADDSUBMVC<0b0011, 1, "mfwemul.mvc">;
-def MFWMACC_MVC  : WADDSUBMVC<0b0100, 1, "mfwmacc.mvc">;
-def MFWMSAC_MVC  : WADDSUBMVC<0b0101, 1, "mfwmsac.mvc">;
-def MFWNMACC_MVC : WADDSUBMVC<0b0110, 1, "mfwnmacc.mvc">;
-def MFWNMSAC_MVC : WADDSUBMVC<0b0111, 1, "mfwnmsac.mvc">;
+def MFWADD_MVC   : WADDSUBMVC<0b000011, 1, "mfwadd.mvc">;
+def MFWSUB_MVC   : WADDSUBMVC<0b000111, 1, "mfwsub.mvc">;
+def MFWRSUB_MVC  : WADDSUBMVC<0b001011, 1, "mfwrsub.mvc">;
+def MFWEMUL_MVC  : WADDSUBMVC<0b001111, 1, "mfwemul.mvc">;
+def MFWMACC_MVC  : WADDSUBMVC<0b010011, 1, "mfwmacc.mvc">;
+def MFWMSAC_MVC  : WADDSUBMVC<0b010111, 1, "mfwmsac.mvc">;
+def MFWNMACC_MVC : WADDSUBMVC<0b011011, 1, "mfwnmacc.mvc">;
+def MFWNMSAC_MVC : WADDSUBMVC<0b011111, 1, "mfwnmsac.mvc">;
 def MFDIV_MVC    :  ADDSUBMVC<0b1000, 1, "mfdiv.mvc">;
 def MFMAX_MVC    :  ADDSUBMVC<0b1010, 1, "mfmax.mvc">;
 def MFMIN_MVC    :  ADDSUBMVC<0b1011, 1, "mfmin.mvc">;
@@ -415,14 +415,14 @@ def MMACC_MX    :  ADDSUBMX<0b0100, 0, "mmacc.mx">;
 def MMSAC_MX    :  ADDSUBMX<0b0101, 0, "mmsac.mx">;
 def MNMACC_MX   :  ADDSUBMX<0b0110, 0, "mnmacc.mx">;
 def MNMSAC_MX   :  ADDSUBMX<0b0111, 0, "mnmsac.mx">;
-def MWADD_MX    : WADDSUBMX<0b0000, 0, "mwadd.mx">;
-def MWSUB_MX    : WADDSUBMX<0b0001, 0, "mwsub.mx">;
-def MWRSUB_MX   : WADDSUBMX<0b0010, 0, "mwrsub.mx">;
-def MWEMUL_MX   : WADDSUBMX<0b0011, 0, "mwemul.mx">;
-def MWMACC_MX   : WADDSUBMX<0b0100, 0, "mwmacc.mx">;
-def MWMSAC_MX   : WADDSUBMX<0b0101, 0, "mwmsac.mx">;
-def MWNMACC_MX  : WADDSUBMX<0b0110, 0, "mwnmacc.mx">;
-def MWNMSAC_MX  : WADDSUBMX<0b0111, 0, "mwnmsac.mx">;
+def MWADD_MX    : WADDSUBMX<0b000011, 0, "mwadd.mx">;
+def MWSUB_MX    : WADDSUBMX<0b000111, 0, "mwsub.mx">;
+def MWRSUB_MX   : WADDSUBMX<0b001011, 0, "mwrsub.mx">;
+def MWEMUL_MX   : WADDSUBMX<0b001111, 0, "mwemul.mx">;
+def MWMACC_MX   : WADDSUBMX<0b010011, 0, "mwmacc.mx">;
+def MWMSAC_MX   : WADDSUBMX<0b010111, 0, "mwmsac.mx">;
+def MWNMACC_MX  : WADDSUBMX<0b011011, 0, "mwnmacc.mx">;
+def MWNMSAC_MX  : WADDSUBMX<0b011111, 0, "mwnmsac.mx">;
 def MDIV_MX     :  ADDSUBMX<0b1000, 0, "mdiv.mx">;
 def MREM_MX     :  ADDSUBMX<0b1001, 0, "mrem.mx">;
 def MMAX_MX     :  ADDSUBMX<0b1010, 0, "mmax.mx">;
@@ -435,14 +435,14 @@ def MFMACC_MF   :  ADDSUBMF<0b0100, 1, "mfmacc.mf">;
 def MFMSAC_MF   :  ADDSUBMF<0b0101, 1, "mfmsac.mf">;
 def MFNMACC_MF  :  ADDSUBMF<0b0110, 1, "mfnmacc.mf">;
 def MFNMSAC_MF  :  ADDSUBMF<0b0111, 1, "mfnmsac.mf">;
-def MFWADD_MF   : WADDSUBMF<0b0000, 1, "mfwadd.mf">;
-def MFWSUB_MF   : WADDSUBMF<0b0001, 1, "mfwsub.mf">;
-def MFWRSUB_MF  : WADDSUBMF<0b0010, 1, "mfwrsub.mf">;
-def MFWEMUL_MF  : WADDSUBMF<0b0011, 1, "mfwemul.mf">;
-def MFWMACC_MF  : WADDSUBMF<0b0100, 1, "mfwmacc.mf">;
-def MFWMSAC_MF  : WADDSUBMF<0b0101, 1, "mfwmsac.mf">;
-def MFWNMACC_MF : WADDSUBMF<0b0110, 1, "mfwnmacc.mf">;
-def MFWNMSAC_MF : WADDSUBMF<0b0111, 1, "mfwnmsac.mf">;
+def MFWADD_MF   : WADDSUBMF<0b000011, 1, "mfwadd.mf">;
+def MFWSUB_MF   : WADDSUBMF<0b000111, 1, "mfwsub.mf">;
+def MFWRSUB_MF  : WADDSUBMF<0b001011, 1, "mfwrsub.mf">;
+def MFWEMUL_MF  : WADDSUBMF<0b001111, 1, "mfwemul.mf">;
+def MFWMACC_MF  : WADDSUBMF<0b010011, 1, "mfwmacc.mf">;
+def MFWMSAC_MF  : WADDSUBMF<0b010111, 1, "mfwmsac.mf">;
+def MFWNMACC_MF : WADDSUBMF<0b011011, 1, "mfwnmacc.mf">;
+def MFWNMSAC_MF : WADDSUBMF<0b011111, 1, "mfwnmsac.mf">;
 def MFDIV_MF    :  ADDSUBMF<0b1000, 1, "mfdiv.mf">;
 def MFMAX_MF    :  ADDSUBMF<0b1010, 1, "mfmax.mf">;
 def MFMIN_MF    :  ADDSUBMF<0b1011, 1, "mfmin.mf">;
@@ -509,21 +509,21 @@ def MMV_M_V_R      : MCVTMM<0b1111, 0b01010, 0, "mmv.m.v.r">;
 def MMV_M_V_C      : MCVTMM<0b1111, 0b01011, 0, "mmv.m.v.c">;
 def MMV_M_M        : MCVTMM<0b1111, 0b01100, 0, "mmv.m.m">;
 
-def MWMV_M_I       : MMoveWidenI<0b1111, 0b01000, "mwmv.m.i">;
-def MWMV_M_X       : MMoveWidenX<0b1111, 0b01001, 0, "mwmv.m.x">;
-def MWMV_M_F       : MMoveWidenF<0b1111, 0b01001, 1, "mwmv.m.f">;
-def MWMV_M_V_R     : MMoveWidenMM<0b1111, 0b01010, 0, "mwmv.m.v.r">;
-def MWMV_M_V_C     : MMoveWidenMM<0b1111, 0b01011, 0, "mwmv.m.v.c">;
-def MWMV_M_M       : MMoveWidenMM<0b1111, 0b01100, 0, "mwmv.m.m">;
+def MWMV_M_I       : MMoveWidenI<0b111111,  0b01000, "mwmv.m.i">;
+def MWMV_M_X       : MMoveWidenX<0b111111,  0b01001, 0, "mwmv.m.x">;
+def MWMV_M_F       : MMoveWidenF<0b111111,  0b01001, 1, "mwmv.m.f">;
+def MWMV_M_V_R     : MMoveWidenMM<0b111111, 0b01010, 0, "mwmv.m.v.r">;
+def MWMV_M_V_C     : MMoveWidenMM<0b111111, 0b01011, 0, "mwmv.m.v.c">;
+def MWMV_M_M       : MMoveWidenMM<0b111111, 0b01100, 0, "mwmv.m.m">;
 
 def MFEXP_M        : MCVTMM<0b1111, 0b10001, 1, "mfexp.m">;
 def MFRSQRT_M      : MCVTMM<0b1111, 0b10010, 1, "mfrsqrt.m">;
 
 def MFQUANT_MF     :   ADDSUBMF<0b1111, 1, "mfquant.mf">;
-def MFDEQNT_MF     :  WADDSUBMF<0b1111, 1, "mfdeqnt.mf">;
+def MFDEQNT_MF     :  WADDSUBMF<0b111111, 1, "mfdeqnt.mf">;
 def MFQUANT_MVC    :  ADDSUBMVC<0b1111, 1, "mfquant.mvc">;
-def MFDEANT_MVC    : WADDSUBMVC<0b1111, 1, "mfdeqnt.mvc">;
+def MFDEANT_MVC    : WADDSUBMVC<0b111111, 1, "mfdeqnt.mvc">;
 def MFQUANT_MVR    :  ADDSUBMVR<0b1111, 1, "mfquant.mvr">;
-def MFDEANT_MVR    : WADDSUBMVR<0b1111, 1, "mfdeqnt.mvr">;
+def MFDEANT_MVR    : WADDSUBMVR<0b111111, 1, "mfdeqnt.mvr">;
 def MQMAQ_MM       :  WADDSUBMM<0b111011, 0, "mqmaq.mvr">;
 }
