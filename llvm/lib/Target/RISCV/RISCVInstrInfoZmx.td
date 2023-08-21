@@ -522,8 +522,8 @@ def MFRSQRT_M      : MCVTMM<0b1111, 0b10010, 1, "mfrsqrt.m">;
 def MFQUANT_MF     :   ADDSUBMF<0b1111, 1, "mfquant.mf">;
 def MFDEQNT_MF     :  WADDSUBMF<0b111111, 1, "mfdeqnt.mf">;
 def MFQUANT_MVC    :  ADDSUBMVC<0b1111, 1, "mfquant.mvc">;
-def MFDEANT_MVC    : WADDSUBMVC<0b111111, 1, "mfdeqnt.mvc">;
+def MFDEQNT_MVC    : WADDSUBMVC<0b111111, 1, "mfdeqnt.mvc">;
 def MFQUANT_MVR    :  ADDSUBMVR<0b1111, 1, "mfquant.mvr">;
 def MFDEANT_MVR    : WADDSUBMVR<0b111111, 1, "mfdeqnt.mvr">;
-def MQMAQ_MM       :  WADDSUBMM<0b111011, 0, "mqmaq.mvr">;
+def MQMAQ_MM       :  WADDSUBMM<0b111011, 0, "mqmaq.mm">;
 }
