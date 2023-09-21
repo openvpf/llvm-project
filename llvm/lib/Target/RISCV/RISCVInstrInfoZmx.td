@@ -79,23 +79,23 @@ let hasSideEffects = 0, mayLoad = 0, mayStore = 1 in {
 // store vd, ts3, (rs1), rs2
 class MatrixStoreM<bits<3> funct6, bits<3> width, string opcodestr>
     : RVInstMSM<funct6, width, (outs),
-                (ins TRR:$tr3, GPR:$rs1, GPR:$rs2, MopiOp:$mopi),
-                opcodestr, "$tr3, (${rs1}), $rs2, $mopi">;
+                (ins TRR:$ts3, GPR:$rs1, GPR:$rs2, MopiOp:$mopi),
+                opcodestr, "$ts3, (${rs1}), $rs2, $mopi">;
 
 class MatrixStoreV<bits<3> funct6, bits<3> width, string opcodestr>
     : RVInstMSV<funct6, width, (outs),
-                (ins TRR:$tr3, GPR:$rs1, MopiOp:$mopi),
-                opcodestr, "$tr3, (${rs1}), $mopi">;
+                (ins TRR:$ts3, GPR:$rs1, MopiOp:$mopi),
+                opcodestr, "$ts3, (${rs1}), $mopi">;
 
 class MatrixStoreS<bits<6> funct6, bits<3> width, string opcodestr>
     : RVInstMSS<funct6, width, (outs),
-                (ins TRR:$tr3, GPR:$rs1), opcodestr,
-                "$tr3, (${rs1})">;
+                (ins TRR:$ts3, GPR:$rs1), opcodestr,
+                "$ts3, (${rs1})">;
 
 class MatrixUFStore<bits<4> funct6, bits<3> width, string opcodestr>
     : RVInstUFMS<funct6, width, (outs),
-                (ins TRR:$tr3, GPR:$rs1, GPR:$rs2, MopiOp:$mopi),
-                opcodestr, "$tr3, (${rs1}), $rs2, $mopi">;
+                (ins TRR:$ts3, GPR:$rs1, GPR:$rs2, MopiOp:$mopi),
+                opcodestr, "$ts3, (${rs1}), $rs2, $mopi">;
 } // hasSideEffects = 0, mayLoad = 0, mayStore = 1
 
 // Matrix Arithmetic
@@ -180,7 +180,7 @@ class MMoveM<bits<6> funct6, bits<5> mode, bit fp, string opcodestr>
 //===----------------------------------------------------------------------===//
 // Instructions
 //===----------------------------------------------------------------------===//
-let Predicates = [HasStdExtV] in {
+let Predicates = [HasStdExtM] in {
 let hasSideEffects = 1, mayLoad = 0, mayStore = 0 in {
 
 // config instruction
@@ -213,38 +213,38 @@ def MSETINSH   : RVInstSetIm2col<0b1001, (outs GPR:$rd), (ins GPR:$rs1, GPR:$rs2
 } // hasSideEffects = 1, mayLoad = 0, mayStore = 0
 
 // Load Store Instructions
-def MLE8_M        : MatrixLoadM<0b000,   0x0, "mle8.m">,   VLSSched<8>;
-def MLE16_M       : MatrixLoadM<0b000,   0x1, "mle16.m">,  VLSSched<8>;
-def MLE32_M       : MatrixLoadM<0b000,   0x2, "mle32.m">,  VLSSched<8>;
+def MLE8_M        : MatrixLoadM<0b000,   0x0, "mle8.m">,   VLSSchedMC<8>;
+def MLE16_M       : MatrixLoadM<0b000,   0x1, "mle16.m">,  VLSSchedMC<8>;
+def MLE32_M       : MatrixLoadM<0b000,   0x2, "mle32.m">,  VLSSchedMC<8>;
 
-def MLE8_V        : MatrixLoadV<0b001,   0x0, "mle8.v">,   VLSSched<8>;
-def MLE16_V       : MatrixLoadV<0b001,   0x1, "mle16.v">,  VLSSched<8>;
-def MLE32_V       : MatrixLoadV<0b001,   0x2, "mle32.v">,  VLSSched<8>;
+def MLE8_V        : MatrixLoadV<0b001,   0x0, "mle8.v">,   VLSSchedMC<8>;
+def MLE16_V       : MatrixLoadV<0b001,   0x1, "mle16.v">,  VLSSchedMC<8>;
+def MLE32_V       : MatrixLoadV<0b001,   0x2, "mle32.v">,  VLSSchedMC<8>;
 
-def MLE8_S        : MatrixLoadS<0b010000,   0x0, "mle8.s">,   VLSSched<8>;
-def MLE16_S       : MatrixLoadS<0b010000,   0x1, "mle16.s">,  VLSSched<8>;
-def MLE32_S       : MatrixLoadS<0b010000,   0x2, "mle32.s">,  VLSSched<8>;
+def MLE8_S        : MatrixLoadS<0b010000,   0x0, "mle8.s">,   VLSSchedMC<8>;
+def MLE16_S       : MatrixLoadS<0b010000,   0x1, "mle16.s">,  VLSSchedMC<8>;
+def MLE32_S       : MatrixLoadS<0b010000,   0x2, "mle32.s">,  VLSSchedMC<8>;
 
-def MSE8_M        : MatrixStoreM<0b000,  0x0, "mse8.m">,   VLSSched<8>;
-def MSE16_M       : MatrixStoreM<0b000,  0x1, "mse16.m">,  VLSSched<8>;
-def MSE32_M       : MatrixStoreM<0b000,  0x2, "mse32.m">,  VLSSched<8>;
+def MSE8_M        : MatrixStoreM<0b000,  0x0, "mse8.m">,   VLSSchedMC<8>;
+def MSE16_M       : MatrixStoreM<0b000,  0x1, "mse16.m">,  VLSSchedMC<8>;
+def MSE32_M       : MatrixStoreM<0b000,  0x2, "mse32.m">,  VLSSchedMC<8>;
 
-def MSE8_V        : MatrixStoreV<0b001,  0x0, "mse8.v">,   VLSSched<8>;
-def MSE16_V       : MatrixStoreV<0b001,  0x1, "mse16.v">,  VLSSched<8>;
-def MSE32_V       : MatrixStoreV<0b001,  0x2, "mse32.v">,  VLSSched<8>;
+def MSE8_V        : MatrixStoreV<0b001,  0x0, "mse8.v">,   VLSSchedMC<8>;
+def MSE16_V       : MatrixStoreV<0b001,  0x1, "mse16.v">,  VLSSchedMC<8>;
+def MSE32_V       : MatrixStoreV<0b001,  0x2, "mse32.v">,  VLSSchedMC<8>;
 
-def MSE8_S        : MatrixStoreS<0b010000,  0x0, "mse8.s">,   VLSSched<8>;
-def MSE16_S       : MatrixStoreS<0b010000,  0x1, "mse16.s">,  VLSSched<8>;
-def MSE32_S       : MatrixStoreS<0b010000,  0x2, "mse32.s">,  VLSSched<8>;
+def MSE8_S        : MatrixStoreS<0b010000,  0x0, "mse8.s">,   VLSSchedMC<8>;
+def MSE16_S       : MatrixStoreS<0b010000,  0x1, "mse16.s">,  VLSSchedMC<8>;
+def MSE32_S       : MatrixStoreS<0b010000,  0x2, "mse32.s">,  VLSSchedMC<8>;
 
 // unfloder load
-def MLUFE8_M      : MatrixUFLoad<0b1100,   0x0, "mlufe8.m">,   VLSSched<8>;
-def MLUFE16_M     : MatrixUFLoad<0b1100,   0x1, "mlufe16.m">,  VLSSched<8>;
-def MLUFE32_M     : MatrixUFLoad<0b1100,   0x2, "mlufe32.m">,  VLSSched<8>;
+def MLUFE8_M      : MatrixUFLoad<0b1100,   0x0, "mlufe8.m">,   VLSSchedMC<8>;
+def MLUFE16_M     : MatrixUFLoad<0b1100,   0x1, "mlufe16.m">,  VLSSchedMC<8>;
+def MLUFE32_M     : MatrixUFLoad<0b1100,   0x2, "mlufe32.m">,  VLSSchedMC<8>;
 
-def MSUFE8_M    : MatrixUFStore<0x0b1100,   0x0, "msufe8.m">,   VLSSched<8>;
-def MSUFE16_M   : MatrixUFStore<0x0b1100,   0x1, "msufe16.m">,  VLSSched<8>;
-def MSUFE32_M   : MatrixUFStore<0x0b1100,   0x2, "msufe32.m">,  VLSSched<8>;
+def MSUFE8_M    : MatrixUFStore<0x0b1100,   0x0, "msufe8.m">,   VLSSchedMC<8>;
+def MSUFE16_M   : MatrixUFStore<0x0b1100,   0x1, "msufe16.m">,  VLSSchedMC<8>;
+def MSUFE32_M   : MatrixUFStore<0x0b1100,   0x2, "msufe32.m">,  VLSSchedMC<8>;
 
 
 // compute inst

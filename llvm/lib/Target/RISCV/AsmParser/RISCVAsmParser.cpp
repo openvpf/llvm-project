@@ -1007,6 +1007,7 @@ public:
   unsigned getFence() const {
     assert(Kind == KindTy::Fence && "Invalid type access!");
     return Fence.Val;
+  }
 
   unsigned getMType() const {
     assert(Kind == KindTy::MType && "Invalid type access!");
@@ -1118,7 +1119,7 @@ public:
     auto Op = std::make_unique<RISCVOperand>(KindTy::MType);
     Op->MType.Val = MTypeI;
     Op->StartLoc = S;
-    Op->IsRV64 = IsRV64;
+    Op->Imm.IsRV64 = IsRV64;
     return Op;
   }
 
@@ -1127,7 +1128,7 @@ public:
     auto Op = std::make_unique<RISCVOperand>(KindTy::MOpiType);
     Op->MOpiType.Val = Mopi;
     Op->StartLoc = S;
-    Op->IsRV64 = IsRV64;
+    Op->Imm.IsRV64 = IsRV64;
     return Op;
   }
 
@@ -2400,10 +2401,10 @@ ParseFail:
 
 ParseStatus RISCVAsmParser::parseMTypeI(OperandVector &Operands) {
   SMLoc S = getLoc();
+  SmallVector<AsmToken, 7> MTypeIElements;
   if (getLexer().isNot(AsmToken::Identifier))
     goto MatchFail;
 
-  SmallVector<AsmToken, 7> MTypeIElements;
   // Put all the tokens for mtypei operand into VTypeIElements vector.
   while (getLexer().isNot(AsmToken::EndOfStatement)) {
     MTypeIElements.push_back(getLexer().getTok());
@@ -2486,12 +2487,12 @@ ParseStatus RISCVAsmParser::parseMemOpBaseReg(OperandVector &Operands) {
   return ParseStatus::Success;
 }
 
-OperandMatchResultTy RISCVAsmParser::parseMopi(OperandVector &Operands) {
+ParseStatus RISCVAsmParser::parseMopi(OperandVector &Operands) {
   SMLoc S = getLoc();
-  if (getLexer().isNot(AsmToken::Identifier))
-    return MatchOperand_NoMatch;
-
   SmallVector<AsmToken, 7> MopiElement;
+  if (getLexer().isNot(AsmToken::Identifier))
+    goto MatchFail;
+
   // Put all the tokens for mtypei operand into VTypeIElements vector.
   while (getLexer().isNot(AsmToken::EndOfStatement)) {
     MopiElement.push_back(getLexer().getTok());
@@ -2533,13 +2534,13 @@ OperandMatchResultTy RISCVAsmParser::parseMopi(OperandVector &Operands) {
     unsigned Mopi =
         RISCVVType::encodeMopi(mopi, mtr);
     Operands.push_back(RISCVOperand::createMopiType(Mopi, S, isRV64()));
-    return MatchOperand_Success;
+    return ParseStatus::Success;
   }
 
   MatchFail:
     while (!MopiElement.empty())
       getLexer().UnLex(MopiElement.pop_back_val());
-    return MatchOperand_NoMatch;
+    return ParseStatus::Failure;
 }
 
 ParseStatus RISCVAsmParser::parseZeroOffsetMemOp(OperandVector &Operands) {

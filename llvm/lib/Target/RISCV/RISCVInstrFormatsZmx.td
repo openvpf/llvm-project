@@ -19,7 +19,7 @@ class RVInstSetMTypei<dag outs, dag ins, string opcodestr, string argstr>
   let Inst{27-15} = mtypei;
   let Inst{14-12} = 0b111;
   let Inst{11-7} = rd;
-  let Opcode = OPC_OP_M.Value;
+  let Inst{6-0} = OPC_OP_M.Value;
 
   let Defs = [MTYPE];
 }
@@ -34,7 +34,7 @@ class RVInstSetMType<dag outs, dag ins, string opcodestr, string argstr>
   let Inst{19-15} = rs1;
   let Inst{14-12} = 0b111;
   let Inst{11-7} = rd;
-  let Opcode = OPC_OP_M.Value;
+  let Inst{6-0} = OPC_OP_M.Value;
 
   let Defs = [MTYPE];
 }
@@ -48,7 +48,7 @@ class RVInstSetTilei<bits<4> mit, dag outs, dag ins, string opcodestr, string ar
   let Inst{27-15} = mleni;
   let Inst{14-12} = 0b111;
   let Inst{11-7} = rd;
-  let Opcode = OPC_OP_M.Value;
+  let Inst{6-0} = OPC_OP_M.Value;
 
   let Defs = [TILEM];
 }
@@ -63,7 +63,7 @@ class RVInstSetTile<bits<4> mit, dag outs, dag ins, string opcodestr, string arg
   let Inst{19-15} = rs1;
   let Inst{14-12} = 0b111;
   let Inst{11-7} = rd;
-  let Opcode = OPC_OP_M.Value;
+  let Inst{6-0} = OPC_OP_M.Value;
 
   let Defs = [TILEM];
 }
@@ -81,7 +81,7 @@ class RVInstSetIm2col<bits<4> mit, dag outs, dag ins, string opcodestr, string a
   let Inst{19-15} = rs1;
   let Inst{14-12} = 0b111;
   let Inst{11-7} = rd;
-  let Opcode = OPC_OP_M.Value;
+  let Inst{6-0} = OPC_OP_M.Value;
 
   let Defs = [MINSH];
 }
@@ -101,7 +101,7 @@ class RVInstMLM<bits<3> funct6, bits<3> width,
   let Inst{19-15} = rs1;
   let Inst{14-12} = width;
   let Inst{11-7} = td;
-  let Opcode = OPC_OP_M.Value;
+  let Inst{6-0} = OPC_OP_M.Value;
 
   let Uses = [MTYPE, TILEM, TILEK, TILEN];
 }
@@ -120,7 +120,7 @@ class RVInstMLV<bits<3> funct6, bits<3> width,
   let Inst{19-15} = rs1;
   let Inst{14-12} = width;
   let Inst{11-7} = td;
-  let Opcode = OPC_OP_M.Value;
+  let Inst{6-0} = OPC_OP_M.Value;
 
   let Uses = [MTYPE, TILEM, TILEK, TILEN];
 }
@@ -137,7 +137,7 @@ class RVInstMLS<bits<6> funct6, bits<3> width,
   let Inst{19-15} = rs1;
   let Inst{14-12} = width;
   let Inst{11-7} = td;
-  let Opcode = OPC_OP_M.Value;
+  let Inst{6-0} = OPC_OP_M.Value;
 
   let Uses = [MTYPE, TILEM, TILEK, TILEN];
 }
@@ -157,7 +157,7 @@ class RVInstUFML<bits<4> funct6, bits<3> width,
   let Inst{19-15} = rs1;
   let Inst{14-12} = width;
   let Inst{11-7} = td;
-  let Opcode = OPC_OP_M.Value;
+  let Inst{6-0} = OPC_OP_M.Value;
 
   let Uses = [MTYPE, TILEM, TILEK, TILEN];
 }
@@ -177,7 +177,7 @@ class RVInstMSM<bits<3> funct6, bits<3> width,
   let Inst{19-15} = rs1;
   let Inst{14-12} = width;
   let Inst{11-7} = ts3;
-  let Opcode = OPC_OP_M.Value;
+  let Inst{6-0} = OPC_OP_M.Value;
 
   let Uses = [MTYPE, TILEM, TILEK, TILEN];
 }
@@ -196,7 +196,7 @@ class RVInstMSV<bits<3> funct6, bits<3> width,
   let Inst{19-15} = rs1;
   let Inst{14-12} = width;
   let Inst{11-7} = ts3;
-  let Opcode = OPC_OP_M.Value;
+  let Inst{6-0} = OPC_OP_M.Value;
 
   let Uses = [MTYPE, TILEM, TILEK, TILEN];
 }
@@ -205,15 +205,15 @@ class RVInstMSS<bits<6> funct6, bits<3> width,
                 dag outs, dag ins, string opcodestr, string argstr>
     : RVInst<outs, ins, opcodestr, argstr, [], InstFormatR> {
   bits<5> rs1;
-  bits<5> tr3;
+  bits<5> ts3;
 
   let Inst{31-26} = funct6;
   let Inst{25} = 1; // store
   let Inst{24-20} = 0;
   let Inst{19-15} = rs1;
   let Inst{14-12} = width;
-  let Inst{11-7} = tr3;
-  let Opcode = OPC_OP_M.Value;
+  let Inst{11-7} = ts3;
+  let Inst{6-0} = OPC_OP_M.Value;
 
   let Uses = [MTYPE, TILEM, TILEK, TILEN];
 }
@@ -233,7 +233,7 @@ class RVInstUFMS<bits<4> funct6, bits<3> width,
   let Inst{19-15} = rs1;
   let Inst{14-12} = width;
   let Inst{11-7} = ts3;
-  let Opcode = OPC_OP_M.Value;
+  let Inst{6-0} = OPC_OP_M.Value;
 
   let Uses = [MTYPE, TILEM, TILEK, TILEN];
 }
@@ -251,7 +251,7 @@ class RVInstMM<bits<6> funct6, bit fp, dag outs, dag ins,
   let Inst{19-15} = ts1;
   let Inst{14-12} = 0b110;
   let Inst{11-7} = td;
-  let Opcode = OPC_OP_M.Value;
+  let Inst{6-0} = OPC_OP_M.Value;
 
   let Uses = [MTYPE, TILEM, TILEK, TILEN];
 }
@@ -268,7 +268,7 @@ class RVInstReduce<bits<6> funct6, bit fp, bits<5> mode, bits<3> tt, dag outs, d
   let Inst{19-15} = ts1;
   let Inst{14-12} = tt;
   let Inst{11-7} = td;
-  let Opcode = OPC_OP_M.Value;
+  let Inst{6-0} = OPC_OP_M.Value;
 
   let Uses = [MTYPE, TILEM, TILEK, TILEN];
 }
@@ -286,7 +286,7 @@ class RVInstADDSUB<bits<6> funct6, bit fp, bits<3> tt, dag outs, dag ins,
   let Inst{19-15} = ts1;
   let Inst{14-12} = tt;
   let Inst{11-7} = td;
-  let Opcode = OPC_OP_M.Value;
+  let Inst{6-0} = OPC_OP_M.Value;
 
   let Uses = [MTYPE, TILEM, TILEK, TILEN];
 }
@@ -305,7 +305,7 @@ class RVInstADDSUBMX<bits<6> funct6, bit fp, bits<3> tt, dag outs, dag ins,
   let Inst{19-15} = ts1;
   let Inst{14-12} = tt;
   let Inst{11-7} = td;
-  let Opcode = OPC_OP_M.Value;
+  let Inst{6-0} = OPC_OP_M.Value;
 
   let Uses = [MTYPE, TILEM, TILEK, TILEN];
 }
@@ -325,7 +325,7 @@ class RVInstMoveMI<bits<6> funct6, bits<5> mode, dag outs, dag ins,
   let Inst{19-15} = mimm5;
   let Inst{14-12} = 0b110;
   let Inst{11-7} = td;
-  let Opcode = OPC_OP_M.Value;
+  let Inst{6-0} = OPC_OP_M.Value;
 
   let Uses = [MTYPE, TILEM, TILEK, TILEN];
 }
@@ -342,7 +342,7 @@ class RVInstMoveMX<bits<6> funct6, bit fp, bits<5> mode, dag outs, dag ins,
   let Inst{19-15} = rs1;
   let Inst{14-12} = 0b110;
   let Inst{11-7} = td;
-  let Opcode = OPC_OP_M.Value;
+  let Inst{6-0} = OPC_OP_M.Value;
 
   let Uses = [MTYPE, TILEM, TILEK, TILEN];
 }
@@ -360,7 +360,7 @@ class RVInstMoveMM<bits<6> funct6, bit fp, bits<5> mode, dag outs, dag ins,
   let Inst{19-15} = ts1;
   let Inst{14-12} = 0b110;
   let Inst{11-7} = td;
-  let Opcode = OPC_OP_M.Value;
+  let Inst{6-0} = OPC_OP_M.Value;
 
   let Uses = [MTYPE, TILEM, TILEK, TILEN];
 }
