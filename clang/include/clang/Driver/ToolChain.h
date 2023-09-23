@@ -99,6 +99,7 @@ public:
   };
 
   enum RuntimeLibType {
+    RLT_None,
     RLT_CompilerRT,
     RLT_Libgcc
   };
