@@ -479,6 +479,7 @@ def MPAD   : RISCVReg<0, "mpad",   ["mpad"]>;
 def MSTDI  : RISCVReg<0, "mstdi",  ["mstdi"]>;
 def MINSK  : RISCVReg<0, "minsk",  ["minsk"]>;
 def MOUTSK : RISCVReg<0, "moutsk", ["moutsk"]>;
+def MPADV  : RISCVReg<0, "mpadv",  ["mpadv"]>;
 
 def MSPIDX : RISCVReg<0, "mspidx", ["mspidx"]>;
 

@@ -458,6 +458,8 @@ def : SysReg<"minsh", 0xC46>;
 def : SysReg<"mpad",  0xC47>;
 def : SysReg<"mstdi", 0xC48>;
 def : SysReg<"minsk", 0xC49>;
-def : SysReg<"moutsk", 0xC50>;
-def : SysReg<"mlut", 0xC51>;
+def : SysReg<"moutsk", 0xC4A>;
+def : SysReg<"mpadv", 0xC4B>;
+
+
 def : SysReg<"mspidx", 0xC51>;

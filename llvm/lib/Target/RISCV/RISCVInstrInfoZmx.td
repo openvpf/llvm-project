@@ -210,6 +210,8 @@ def MSETOUTSH  : RVInstSetIm2col<0b1000, (outs GPR:$rd), (ins GPR:$rs1, GPR:$rs2
                          "msetoutsh", "$rd, $rs1, $rs2">;
 def MSETINSH   : RVInstSetIm2col<0b1001, (outs GPR:$rd), (ins GPR:$rs1, GPR:$rs2),
                          "msetinsh", "$rd, $rs1, $rs2">;
+def MSETPADV   : RVInstSetTile<0b1011, (outs GPR:$rd), (ins GPR:$rs1),
+                         "msetpadv", "$rd, $rs1">;
 } // hasSideEffects = 1, mayLoad = 0, mayStore = 0
 
 // Load Store Instructions
