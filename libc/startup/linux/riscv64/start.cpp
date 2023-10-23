@@ -128,7 +128,7 @@ __attribute__((noinline)) static void do_start() {
                   "lla gp, __global_pointer$\n\t"
                   ".option pop\n\t");
   auto tid = __llvm_libc::syscall_impl<long>(SYS_gettid);
-  if (tid <= 0)
+  if (tid < 0)
     __llvm_libc::syscall_impl<long>(SYS_exit, 1);
   __llvm_libc::main_thread_attrib.tid = static_cast<int>(tid);
 
